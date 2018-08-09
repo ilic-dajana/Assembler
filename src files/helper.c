@@ -72,14 +72,42 @@ int is_substr(const char *str, const char *substr){
 	return 1;
 }
 
-const Instruction* search_for_instruction(const char *ins){
 
+//help to search tables
+
+
+Instruction* search_for_instruction(char* ins){
+	int i = 0;
+
+	while(i <= size_table_ins){
+		if(strcmp(ins, table_of_instructions[i].ins)==0
+			return table_of_instructions[i];
+		else
+			i++;
+	}
+	return NULL;
+}
+Directive* search_for_directive(char* dir){
+	int i = 0;
+
+	while(i <= size_table_dir){
+		if(strcmp(dir, table_of_directives[i].ins)==0
+			return table_of_directives[i];
+		else
+			i++;
+	}
+	return NULL;
 }
 
-const Directive* search_for_directive(const char *dir){
+char* search_for_register(char* reg){
 
-}
+	int i = 0;
 
-const char *search_for_register(const char *reg){
-	
+	while(i <= size_table_reg){
+		if(strcmp(reg, table_of_registers[i])==0)
+			return table_of_registers[i];
+		else
+			i++;
+	}
+	return NULL;
 }

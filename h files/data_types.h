@@ -126,7 +126,7 @@ typedef struct pnode
 
 typedef struct 
 {
-	const char *mnemonic;
+	const char *ins;
 	int paramNo;
 	Addressings addrType;
 	InstructionSymbol ins;
@@ -135,7 +135,7 @@ typedef struct
 
 typedef struct 
 {
-	const char *mnemonic;
+	const char *dir;
 	Directives dirType;
 	
 }Directive;
@@ -155,13 +155,20 @@ typedef struct lnode
 
 typedef Line *ParsedText;
 
-typedef struct token {
+typedef struct {
 	const char *name;
 	TokenType token_type;
+} Token;
+
+typedef struct token {
+	Token tok;
 	struct token *next;
 } TokenNode;
 
-typedef TokenNode *TokenizedFile;
+typedef TokenNode* TokenizedFile;
+
+extern char *pool_pointer;
+extern long pool_size;
 
 
 #endif
