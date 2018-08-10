@@ -4,7 +4,7 @@
 #include "tables.h"
 
 static char* from_ptr = NULL;
-static char* to_ptr = NULL;
+static int TOKEN_SIZE = 31;
 int line = 0;
 
 void delete_tokens(TokenizedFile file){
@@ -19,9 +19,9 @@ void delete_tokens(TokenizedFile file){
 
 }
 
-Token getNextToken(){
-	Token newToken = {NULL, UNDEFINED};
-
+Token* getNextToken(){
+	Token* newToken = (Token*)malloc(TOKEN_SIZE);
+	char* to_ptr;
 	while(*from_ptr){
 		if(from_ptr == ' ' && *from_ptr!='\n')
 			from_ptr++;
@@ -56,8 +56,8 @@ Token getNextToken(){
 		newToken.token_type = NEWLINE
 		line++;
 	}else{
-		Token tok = {to_ptr, UNDEFINED};
-		*to_ptr++ = *from_ptr;
+		Token tok = {NULL, UNDEFINED};
+		 *to_ptr= *from_ptr;
 
 		if(!isalnum(*from_ptr) && *from_ptr!='_' && *from_ptr != '.'){
 			*to_ptr++ = '\0';
@@ -65,29 +65,36 @@ Token getNextToken(){
 		}
 
 		while(isalnum(*from_ptr) || *from_ptr == '_' || *from_ptr == '.'){
-			*to_ptr++ = *from_ptr;
+			*to_ptr++ = *from_ptr++;
 		}
 		*to_ptr++ ='\0';
 
-		--from_ptr;
-		if(isdigit(*tok.name)){
-			if(is_num_decimal(tok.name)) tok.token_type = LITERAL;
-		}else{
-			if(strlen(tok.name) > 31 ) tok.token_type = UNDEFINED;
-			else if(strlen(tok.name) > 7) tok.token_type =  SYMBOL;
-			else if(search_for_instruction(tok.name)!=NULL) tok.token_type = INSTRUCTION;
-			else if(search_for_directive(tok.name) != NULL) tok.token_type = DIRECTIVE;
-			else if(sear_for_registers(tok.name)!= NULL) tok.token_type = REGISTER;
-			else tok.token_type = SYMBOL;
-		}
-		newToken = tok;
+	
+		tok.name = to_ptr; ///????
+		to_ptr = NULL;
+		if(sizeof(tok))
+			tok.token_type = UNDEFINED;
+		else{
+			if(isdigit(*tok.name)){
+				if(is_num_decimal(tok.name)) tok.token_type = LITERAL;
+				}else{
+					if(strlen(tok.name) > 31 ) tok.token_type = UNDEFINED;
+					else if(strlen(tok.name) > 7) tok.token_type =  SYMBOL;
+					else if(search_for_instruction(tok.name)!=NULL) tok.token_type = INSTRUCTION;
+					else if(search_for_directive(tok.name) != NULL) tok.token_type = DIRECTIVE;
+					else if(sear_for_registers(tok.name)!= NULL) tok.token_type = REGISTER;
+					else tok.token_type = SYMBOL;
+				}
+	}
+		newToken.name = tok.name;
+		newToken.token_type = tok.token_type;
 	}
 	++from_ptr;
 
 	return newToken;
 }
 
-TokenNode* sort_list(){
+TokenNode* make_token_list(){
 	TokenNode *first = NULL;
 	TokenNode *last = NULL;
 
@@ -117,4 +124,21 @@ TokenNode* sort_list(){
 		last = last->next = node;
 }
 	return first;
+}
+
+TokenizedFile tokenizingFile(Buffer filebuf){
+	from_ptr = filebuf.buf;
+	TokenizedFile token_file ;
+
+	line = 1;
+	TokenNode* list_of_tokens = make_token_list();
+
+	if(list_of_tokens == NULL)
+		exit(1);
+	else{
+		token_file = list_of_tokens;	
+	}
+
+	line = 0;
+	from_ptr = 0;
 }

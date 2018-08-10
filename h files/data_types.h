@@ -156,19 +156,18 @@ typedef struct lnode
 typedef Line *ParsedText;
 
 typedef struct {
-	const char *name;
+	char* name;
 	TokenType token_type;
 } Token;
 
 typedef struct token {
-	Token tok;
+	Token* tok;
 	struct token *next;
 } TokenNode;
 
 typedef TokenNode* TokenizedFile;
 
-extern char *pool_pointer;
-extern long pool_size;
+
 
 
 #endif
