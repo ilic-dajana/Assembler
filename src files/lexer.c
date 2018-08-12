@@ -126,7 +126,7 @@ TokenNode* make_token_list(){
 	return first;
 }
 
-TokenizedFile tokenizingFile(Buffer filebuf){
+TokenNode* tokenizingFile(Buffer filebuf){
 	from_ptr = filebuf.buf;
 	TokenizedFile token_file ;
 
@@ -141,4 +141,5 @@ TokenizedFile tokenizingFile(Buffer filebuf){
 
 	line = 0;
 	from_ptr = 0;
+	return toen_file;
 }

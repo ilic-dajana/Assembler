@@ -111,6 +111,7 @@ typedef enum {
 	PCREL
 }ParameterType;
 
+
 typedef struct pnode
 {
 	ParameterType ptype;
@@ -140,20 +141,28 @@ typedef struct
 	
 }Directive;
 
+typedef enum{
+	EMPTY,
+	INSTRUCTION,
+	DIRECTIVE,
+	LABEL,
+} opType;
+
+
 typedef struct lnode
 {
 	const char *label;
 	union{
-		const Instruction *ins;
-		const Directive *dir;
+		const Instruction* ins;
+		const Directive* dir;
 	};
 	int paramNo;
 	Parameter *params;
-	int lineNo;
 	struct lnode *next;
+	opType op;
 } Line;
 
-typedef Line *ParsedText;
+
 
 typedef struct {
 	char* name;
@@ -165,7 +174,7 @@ typedef struct token {
 	struct token *next;
 } TokenNode;
 
-typedef TokenNode* TokenizedFile;
+
 
 
 

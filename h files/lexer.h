@@ -4,7 +4,7 @@
 #include "data_types.h"
 #include "tables.h"
 
-TokenizedFile tokenizingFile(Buffer file);
+TokenNode* tokenizingFile(Buffer file);
 void delete_tokens(TokenizedFile tokFile);
 
 #endif
