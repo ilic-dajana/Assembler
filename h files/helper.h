@@ -19,5 +19,7 @@ Instruction* search_for_instruction(char* ins);
 Directive* search_for_directive(char* dir);
 char* search_for_register(char* reg);
 
+//Cmd line arguments parsing
 
+void parseCmd(int argc, char* argv[]);
 #endif

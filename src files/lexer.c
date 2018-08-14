@@ -2,6 +2,7 @@
 #include "helper.h"
 #include "data_types.h"
 #include "tables.h"
+#include "error.h"
 
 static char* from_ptr = NULL;
 static int TOKEN_SIZE = 31;
@@ -21,6 +22,8 @@ void delete_tokens(TokenizedFile file){
 
 Token* getNextToken(){
 	Token* newToken = (Token*)malloc(TOKEN_SIZE);
+	if(!newToken)
+		error("Error while allocating memory");
 	char* to_ptr;
 	while(*from_ptr){
 		if(from_ptr == ' ' && *from_ptr!='\n')
@@ -102,9 +105,9 @@ TokenNode* make_token_list(){
 		Token nextTok = getNextToken();
 		TokenNode *node = NULL;
 		node = malloc(sizeof(TokenNode));
-		if(!node)
-			return NULL;
-
+		if(!node){
+			 error("Error while allocating memory!");
+			}
 		if(nextTok.token_type == EOF){
 			if(last->token_type != NEWLINE){
 				nextTok.token_type = NEWLINE;
@@ -115,6 +118,10 @@ TokenNode* make_token_list(){
 			}else
 				free(node);
 		break;
+	}
+	if(nextTok.token_type == UNDEFINED)
+	{
+		error("Error: UNDEFINED token");
 	}
 	node->tok = t;
 	node->next = NULL;
@@ -141,5 +148,5 @@ TokenNode* tokenizingFile(Buffer filebuf){
 
 	line = 0;
 	from_ptr = 0;
-	return toen_file;
+	return token_file;
 }

@@ -118,8 +118,8 @@ typedef struct pnode
 	char is_long;
 	char regNo;
 	union{
-		const char* sym_name;
-		int32_t value;
+		const char* symbol;
+		int value;
 	};
 	struct pnode *next;
 	
