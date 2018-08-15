@@ -7,6 +7,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <argp.h>
+
+void parseArgs(int argc, char* argv[]){
+
+		char* args_a = "INPUT OUTPUT";
+		struct arqp_option options[] = {
+			{"input_file", 'i',0 , 0,  "input file name"},
+			{"address", 'a', "ADDR", 0, "start addr"}.
+			{"output_file", 'o', 0, 0, "output file"}
+		};
+		struct argp argp = {options, parse_opt, args_a, 0, 0, 0};
+		argp_parse(&argp, argc, argv, 0, 0, &argv);
+}
 
 
 Buffer loadFromFile(const char* filename){

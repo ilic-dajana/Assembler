@@ -21,5 +21,5 @@ char* search_for_register(char* reg);
 
 //Cmd line arguments parsing
 
-void parseCmd(int argc, char* argv[]);
+void parseArg(int argc, char* argv[]);
 #endif
