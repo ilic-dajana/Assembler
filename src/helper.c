@@ -3,6 +3,7 @@
 #include "helper.h"
 #include "data_types.h"
 #include "tables.h"
+#include "error.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,39 +13,47 @@
 void parseArgs(int argc, char* argv[]){
 
 		char* args_a = "INPUT OUTPUT";
-		struct arqp_option options[] = {
+		struct argp_option options[] = {
 			{"input_file", 'i',0 , 0,  "input file name"},
-			{"address", 'a', "ADDR", 0, "start addr"}.
+			{"address", 'a', "ADDR", 0, "start addr"},
 			{"output_file", 'o', 0, 0, "output file"}
 		};
-		struct argp argp = {options, parse_opt, args_a, 0, 0, 0};
+		struct argp argp = {options, parseArgs , args_a, 0, 0, 0};
 		argp_parse(&argp, argc, argv, 0, 0, &argv);
 }
 
 
 Buffer loadFromFile(const char* filename){
-	Buffer buff;
-	
-	if(!filename) return NULL;
-	
-	FILE* file = fopen(filename, "r");
-	if(!fp) return NULL;
-	
-	long size;
-	fseek(fp, 0, SEEK_END);
-	size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	
-	char* filebuff = (char*) malloc(size + 1);
-	if(!buffer)
-	{
-			fclose(fp);
-			return NULL;
+	Buffer buff ;
+	buff.buff = NULL;
+	buff.buffersize = 0;
+
+	if(!filename) {
+		error("file does not exist");
+		return buff;
 	}
 	
-	fread(filebuff, size, sizeof(char),fp);
+	FILE* file = fopen(filename, "r");
+	if(!file) {
+		error("File have not opened properly");
+		return buff;
+	}
+	long size;
+	fseek(file, 0, SEEK_END);
+	size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	
+	char* filebuff = (char*) malloc(size + 1);
+	if(!filebuff)
+	{
+			fclose(file);
+			error("allocating problem");
+			return buff;
+	}
+	
+	fread(filebuff, size, sizeof(char),file);
 	filebuff[size]='\0';
-	fclose(fp);
+	fclose(file);
 	
 	buff.buff = filebuff;
 	buff.buffersize = size;
@@ -52,7 +61,7 @@ Buffer loadFromFile(const char* filename){
 }
 
 void freeBuff(Buffer filebuff){
-	free(filebuff.buffer);
+	free(filebuff.buff);
 	filebuff.buffersize = 0;
 }
 
@@ -91,25 +100,30 @@ int is_substr(const char *str, const char *substr){
 
 Instruction* search_for_instruction(char* ins){
 	int i = 0;
-
+	Instruction* instr = malloc(sizeof(Instruction));
+	instr->ins = NON;
 	while(i <= size_table_ins){
-		if(strcmp(ins, table_of_instructions[i].ins)==0
-			return table_of_instructions[i];
+		if(strcmp(ins, table_of_instructions[i].ins_name)==0)
+			return table_of_instructions + i;
 		else
 			i++;
 	}
-	return NULL;
+	error("Instruction does not exist");
+	return instr;
 }
 Directive* search_for_directive(char* dir){
 	int i = 0;
+	Directive* direct = malloc(sizeof(Directive));
+	direct->dirType = NONDEF;
 
 	while(i <= size_table_dir){
-		if(strcmp(dir, table_of_directives[i].ins)==0
-			return table_of_directives[i];
+		if(strcmp(dir, table_of_directives[i].dir)==0)
+			return table_of_directives + i;
 		else
 			i++;
 	}
-	return NULL;
+	error("Directive does not exist");
+	return direct;
 }
 
 char* search_for_register(char* reg){
@@ -122,5 +136,6 @@ char* search_for_register(char* reg){
 		else
 			i++;
 	}
+	error("Regiester does not exist");
 	return NULL;
 }

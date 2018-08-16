@@ -34,4 +34,4 @@ $(OBJDIR):
 
 .PHONY: clean
 clean:
-	rm -rf $(ODIR)
+	rm -rf $(OBJDIR)

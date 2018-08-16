@@ -2,11 +2,6 @@
 #define _DATA_TYPES_H_
 
 
-typedef enum{
-	BYTE 8,
-	WORD 16,
-	DOUBLE_WORD 32,
-}DataT;
 
 
 
@@ -42,7 +37,7 @@ typedef enum {
 
 typedef enum{
 	IMMED = 0x0,
-	REGDIR = 0x1,
+	A_REGDIR = 0x1,
 	MEMDIR = 0x2,
 	REGINDPOM = 0x3,
 }Addressings;
@@ -54,7 +49,7 @@ typedef enum {
 } AddressingOp;
 
 typedef enum {
-	NON = -1.,
+	NON = -1,
 	CALL = 0x0,
 	ADD = 0x1,
 	SUB = 0x2,
@@ -85,9 +80,9 @@ typedef enum {
 typedef enum {
 	NODEF,
 	SECTION,
-	START
+	START,
 	IMPORT_EXPORT,
-	EOF,
+	D_EOF,
 	DATA,
 	ALIGN,
 	SKIP,
@@ -127,7 +122,7 @@ typedef struct pnode
 
 typedef struct 
 {
-	const char *ins;
+	const char *ins_name;
 	int paramNo;
 	Addressings addrType;
 	InstructionSymbol ins;
@@ -143,9 +138,9 @@ typedef struct
 
 typedef enum{
 	EMPTY,
-	INSTRUCTION,
-	DIRECTIVE,
-	LABEL,
+	O_INSTRUCTION,
+	O_DIRECTIVE,
+	O_LABEL,
 } opType;
 
 
@@ -159,7 +154,7 @@ typedef struct lnode
 	int paramNo;
 	Parameter *params;
 	struct lnode *next;
-	opType op;
+	opType type;
 } Line;
 
 

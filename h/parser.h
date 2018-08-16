@@ -5,6 +5,6 @@
 #include "data_types.h"
 
 
-Line* parsing(TokenizedFile tf);
+Line* parsing(TokenNode* tf);
 
 #endif

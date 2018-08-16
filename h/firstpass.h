@@ -7,7 +7,8 @@
 
 typedef enum{
 	SECTION,
-	LABEL,
+	SYMBOL,
+	NON,
 } SymbolType;
 
 typedef enum{
@@ -42,7 +43,15 @@ typedef struct symtab {
 
 extern SymbolNode* symbolTable;
 
-Symbol* addSymbol(SymbolTable* tab, )
+Symbol* addSymbol(SymbolTable* tab, const char* name, long offset, Section section, ScopeType sctype );
 
+Symbol* addSection(SymbolTable* tab, const char* name);
+
+Symbol* findSymbol(SymbolTable* tab, const char* symbol);
+
+Symbol* findSection(SymbolTable* tab, long secNum);
+
+
+void deleteSymbolTable(SymbolTable *tab);
 
 #endif

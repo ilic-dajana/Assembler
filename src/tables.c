@@ -29,7 +29,7 @@ const Instruction table_of_instructions[] = {
 };
 const int size_table_ins = sizeof(table_of_instructions)/sizeof(table_of_instructions[0]);
 
-const char* table_of_registers[] = {
+const char*table_of_registers[] = {
 	"R0",  "R1",  "R2",  "R3",
     "R4",  "R5",  "R6",  "R7",
     "R8",  "R9", "R10", "R11",
@@ -39,7 +39,7 @@ const char* table_of_registers[] = {
 const int size_table_reg = sizeof(table_of_registers)/sizeof(table_of_registers[0]);
 
 
-const Directive table_of_directives = {
+const Directive table_of_directives[] = {
 	{ ".TEXT",   SECTION       },
     { ".DATA",   SECTION       },
     { ".RODATA", SECTION       },

@@ -9,7 +9,7 @@ extern const int size_table_ins;
 extern const Directive table_of_directives[];
 extern const int size_table_dir;
 
-extern const table_of_registers[];
+extern const char* table_of_registers[];
 extern const int size_table_reg;
 
 
