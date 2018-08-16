@@ -28,6 +28,7 @@ typedef struct
 	long offset;
 	long num;
 	Section section;
+	long secNo;
 }Symbol;
 
 typedef struct SymNode {
@@ -43,7 +44,7 @@ typedef struct symtab {
 
 extern SymbolNode* symbolTable;
 
-Symbol* addSymbol(SymbolTable* tab, const char* name, long offset, Section section, ScopeType sctype );
+Symbol* addSymbol(SymbolTable* tab, const char* name, long offset, Section section, ScopeType sctype, long val );
 
 Symbol* addSection(SymbolTable* tab, const char* name);
 
@@ -51,7 +52,8 @@ Symbol* findSymbol(SymbolTable* tab, const char* symbol);
 
 Symbol* findSection(SymbolTable* tab, long secNum);
 
-
 void deleteSymbolTable(SymbolTable *tab);
+
+int firstPass(Line* parsedFile);
 
 #endif
