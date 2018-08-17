@@ -1,8 +1,9 @@
-#include "secondpass.h"
+/*#include "secondpass.h"
 #include "data_types.h"
 #include "helper.h"
 #include "error.h"
 
+#include <stdlib.h>
 
 int addRecord(RelocationTable* tab, RelType type, long offset, int sym){
 	RelocationRecNode* node = (RelocationRecNode*) malloc(sizeof(RelocationRecNode));
@@ -41,4 +42,4 @@ void deleteRelocationTable(RelocationTable* tab, int ntabs){
 		tab->cnt = 0;
 	}
 
-}
+}*/

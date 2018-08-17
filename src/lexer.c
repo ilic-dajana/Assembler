@@ -26,12 +26,12 @@ void delete_tokens(TokenNode* file){
 }
 
 Token* getNextToken(){
-	Token* newToken = (Token*)malloc(TOKEN_SIZE);
+	Token* newToken = (Token*)malloc(sizeof(Token));
 	if(!newToken)
 		error("Error while allocating memory");
 	char* to_ptr;
 	while(*from_ptr){
-		if(*from_ptr == ' ' && *from_ptr!='\n')
+		if(*from_ptr == ' ' || *from_ptr=='\t')
 			from_ptr++;
 	}
 

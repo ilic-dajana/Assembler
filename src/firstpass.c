@@ -1,4 +1,4 @@
-#include "firstpass.h"
+/*#include "firstpass.h"
 #include "data_types.h"
 #include "helper.c"
 #include "error.h"
@@ -36,7 +36,7 @@ Symbol* addSymbol(SymbolTable* tab,const char* name, long offset, Section sectio
 		error("Memory allocation problem");
 
 	strcpy(node->symbol.name, name);
-	node->symbol.type = SYMBOL;
+	node->symbol.type = ST_SYMBOL;
 	node->symbol.sctype = sctype;
 	node->symbol.offset = offset;
 	node->section = section;
@@ -76,7 +76,7 @@ Symbol* addSection(SymbolTable* tab, long ndx, Section section ){
 		error("Memory allocation problem");
 
 	strcpy(node->symbol.name, name);
-	node->symbol.type = SECTION;
+	node->symbol.type = ST_SECTION;
 	node->symbol.sctype = sctype;
 	node->symbol.offset = 0;
 	node->section = section;
@@ -182,4 +182,4 @@ int firstPass(Line* parsedFile){
 		currentLine = currentLine -> next;
 		
 	}
-}	
+}	*/

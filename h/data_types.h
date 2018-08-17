@@ -113,7 +113,7 @@ typedef struct pnode
 	char is_long;
 	char regNo;
 	union{
-		const char* symbol;
+		char symbol[32];
 		int value;
 	};
 	struct pnode *next;
@@ -122,7 +122,7 @@ typedef struct pnode
 
 typedef struct 
 {
-	const char *ins_name;
+	char ins_name[32];
 	int paramNo;
 	Addressings addrType;
 	InstructionSymbol ins;
@@ -131,7 +131,7 @@ typedef struct
 
 typedef struct 
 {
-	const char *dir;
+	char dir[32];
 	Directives dirType;
 	
 }Directive;
@@ -146,7 +146,7 @@ typedef enum{
 
 typedef struct lnode
 {
-	const char *label;
+	char label[32];
 	union{
 		const Instruction* ins;
 		const Directive* dir;
@@ -160,7 +160,7 @@ typedef struct lnode
 
 
 typedef struct {
-	char* name;
+	char name[32];
 	TokenType token_type;
 } Token;
 

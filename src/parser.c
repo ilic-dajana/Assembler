@@ -12,7 +12,7 @@ static TokenNode* globalToken = NULL;
 static Line* current  = NULL; 
 static Token token;
 
-Token getNextToken(){
+Token getNext(){
 	Token tok;
 	if(!globalToken)
 	{
@@ -37,7 +37,7 @@ int checkTokenType(TokenType type){
 int checkIfCons(int mark){
 	const char* cons = token.name;
 	long intpart = strtol(cons, NULL, 10);
-	token = getNextToken();
+	token = getNext();
 
 	if(mark == 1){
 		if(intpart == UINT_MAX + 1)
@@ -75,61 +75,61 @@ Parameter* getParameter(){
 
 	if(token.token_type == DOLLAR){
 		parameter->ptype = PCREL;
-		token = getNextToken();
+		token = getNext();
 		if(checkTokenType(SYMBOL)){
 			parameter->symbol = token.name;
-			token = getNextToken();
+			token = getNext();
 		}
 	}else if(token.token_type == ASTERISK){
 		parameter->ptype = MEMDIR_CON;
-		token = getNextToken();
+		token = getNext();
 		if(checkTokenType(PLUS))
 			mark = 1;
 		else if(checkTokenType(MINUS))
 			mark = -1;
-		token = getNextToken();
+		token = getNext();
 
 		parameter->value = checkIfCons(mark);
 	}else if(token.token_type == AMPERSAND){
 		parameter->ptype = IMMED_SYM;
 		parameter->symbol = token.name;
-		token = getNextToken();
+		token = getNext();
 	}else if(token.token_type == SYMBOL){
 		parameter->ptype = MEMDIR_SYM;
 		parameter->symbol = token.name;
-		token = getNextToken();
+		token = getNext();
 	}else if(token.token_type == PLUS){
 		mark = 1;
 		parameter->ptype = NOPARAM;
 		parameter->symbol = NULL;
-		token = getNextToken();
+		token = getNext();
 	}else if(token.token_type == MINUS){
 		mark = -1;
 		parameter->ptype = NOPARAM;
 		parameter->symbol = NULL;
-		token = getNextToken();
+		token = getNext();
 	}else if(token.token_type == LITERAL){
 		parameter->ptype = IMMED_CON;
 		parameter->value = checkIfCons(mark);
 	}else if(token.token_type == REGISTER ){
 		parameter->ptype = REGDIR;
 		parameter->regNo = atoi(token.name + 1);
-		token = getNextToken();
+		token = getNext();
 
 		if(checkTokenType(LBRACKET)){
 
-			token = getNextToken();
+			token = getNext();
 
 			if(token.token_type == PLUS){
 			mark = 1;
 			parameter->ptype = NOPARAM;
 			parameter->symbol = NULL;
-			token = getNextToken();
+			token = getNext();
 		}else if(token.token_type == MINUS){
 			mark = -1;
 			parameter->ptype = NOPARAM;
 			parameter->symbol = NULL;
-			token = getNextToken();
+			token = getNext();
 		}else if(token.token_type == LITERAL){
 			parameter->ptype = IMMED_CON;
 			parameter->value = checkIfCons(mark);
@@ -137,13 +137,13 @@ Parameter* getParameter(){
 		}else if(token.token_type == SYMBOL){
 			parameter->ptype = MEMDIR_SYM;
 			parameter->symbol = token.name;
-			token = getNextToken();
+			token = getNext();
 		}else
 			error("Unexpected token type");
 		if(!checkTokenType(RBRACKET))
 			error("Unexpected token type");
 		else
-			token = getNextToken();
+			token = getNext();
 
 	}else
 		error("Parameter expected");
@@ -155,7 +155,7 @@ return parameter;
 void getParameters(){
 	Parameter* head = NULL;
 	Parameter* tail = NULL;
-	int n;
+	int n = 0;;
 
 	if(isTypeSym(token.token_type)){
 		head = tail = (Parameter*) calloc(1, sizeof(Parameter));
@@ -171,7 +171,7 @@ void getParameters(){
 	}
 
 	while(checkTokenType(COMMA)){
-		token = getNextToken();
+		token = getNext();
 		tail->next = calloc(1, sizeof(Parameter));
 		if(tail->next == NULL)
 			error("Error while allocating memory");
@@ -189,26 +189,26 @@ void getcurrent(Token token){
 	if(checkTokenType(SYMBOL)){
 		current->label = token.name;
 
-		token = getNextToken();
+		token = getNext();
 
 		if(checkTokenType(COLON))
-			token=getNextToken();
+			token=getNext();
 		else error("Unexpected token");
 	}else if(checkTokenType(DIRECTIVE)){
 		current->type = O_DIRECTIVE;
 		current->dir = search_for_directive(token.name);
-		token = getNextToken();
+		token = getNext();
 		getParameters();
 	}else if(checkTokenType(INSTRUCTION)){
 		current->type = INSTRUCTION;
 		current->ins = search_for_instruction(token.name);
-		token = getNextToken();
+		token = getNext();
 		getParameters();
 	}else if(checkTokenType(COMMENT))
-			token = getNextToken();
+			token = getNext();
 
 	if(checkTokenType(NEWLINE))
-		token = getNextToken();
+		token = getNext();
 	else
 		error("Unexpected token");
 
@@ -223,7 +223,7 @@ Line* parsing(TokenNode* tokenFile){
 	
 	Line* head = NULL; 
 	Line* tail = NULL;
-	token = getNextToken();
+	token = getNext();
 
 	while(1){
 		if(token.token_type != EOF){
