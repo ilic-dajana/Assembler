@@ -1,10 +1,11 @@
 #include "firstpass.h"
 #include "data_types.h"
-#include "helper.c"
+#include "helper.h"
 #include "error.h"
 #include "parser.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 static SymbolTable tab;
 static Symbol *currentSymbol;
@@ -124,6 +125,7 @@ long sizeofinstruction(){
 	if(currentLine->ins->ins != NON){
 
 	}
+	return 0;
 }
 
 int firstPass(Line* parsedFile){
@@ -150,7 +152,7 @@ int firstPass(Line* parsedFile){
 
 		}
 
-		if(currentLine->type = O_INSTRUCTION){
+		if(currentLine->type == O_INSTRUCTION){
 
 			if(!currentSymbol)
 				error("Unrecognized section");
@@ -176,7 +178,7 @@ int firstPass(Line* parsedFile){
 			cnt += sizeofinstruction();
 		}
 
-		if(currentLine->type = O_DIRECTIVE){
+		if(currentLine->type == O_DIRECTIVE){
 			
 		}
 		currentLine = currentLine -> next;

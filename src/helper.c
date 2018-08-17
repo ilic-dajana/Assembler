@@ -1,4 +1,4 @@
-//File:fileoptions.h
+
 
 #include "helper.h"
 #include "data_types.h"
@@ -10,8 +10,7 @@
 #include <ctype.h>
 #include <argp.h>
 
-void parseArgs(int argc, char* argv[]){
-
+/*
 		char* args_a = "INPUT OUTPUT";
 		struct argp_option options[] = {
 			{"input_file", 'i',0 , 0,  "input file name"},
@@ -21,7 +20,7 @@ void parseArgs(int argc, char* argv[]){
 		struct argp argp = {options, parseArgs , args_a, 0, 0, 0};
 		argp_parse(&argp, argc, argv, 0, 0, &argv);
 }
-
+*/
 
 Buffer loadFromFile(const char* filename){
 	Buffer buff ;
