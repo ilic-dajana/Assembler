@@ -2,6 +2,7 @@
 #include "helper.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 static FILE* fp = NULL;
 
@@ -14,5 +15,6 @@ int init(){
 }
 
 void error(const char* msg){
-	fprintf(fp, "Error: %s\n", msg );
+	printf("Error: %s\n", msg );
+	exit(1);
 }

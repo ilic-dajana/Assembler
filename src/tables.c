@@ -45,7 +45,7 @@ const Directive table_of_directives[] = {
     { ".RODATA", SECTION       },
     { ".BSS",    SECTION       },
     { ".GLOBAL", IMPORT_EXPORT },
-    { ".END",    EOF           },
+    { ".END",    D_EOF           },
     { ".ALIGN",  ALIGN         },
     { ".SKIP",   SKIP          },
     { ".CHAR",   DATA      },

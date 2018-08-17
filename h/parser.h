@@ -1,4 +1,4 @@
-
+/*
 #ifndef _PARSER_H_
 #define _PARSER_H_
 
@@ -7,4 +7,4 @@
 
 Line* parsing(TokenNode* tf);
 
-#endif
+#endif*/

@@ -1,8 +1,10 @@
-/*#include "firstpass.h"
+#include "firstpass.h"
 #include "data_types.h"
 #include "helper.c"
 #include "error.h"
 #include "parser.h"
+
+#include <stdlib.h>
 
 static SymbolTable tab;
 static Symbol *currentSymbol;
@@ -18,12 +20,11 @@ Symbol* addSymbol(SymbolTable* tab,const char* name, long offset, Section sectio
 		if(!node)
 			error("Memory allocation problem");
 
-		node->symbol.type = NON;
-		node->symbol.name = NULL;
+		node->symbol.type = NON;		
 		node->symbol.sctype = LOCAL;
 		node->symbol.offset = 0;
 		node->symbol.num = 0;
-		node->symbol.section = NO_SECTION;
+		node->symbol.section = SEC_NO_SECTION;
 
 		tab->tail = tab->head = node;
 		tab->head->next = NULL;
@@ -39,12 +40,12 @@ Symbol* addSymbol(SymbolTable* tab,const char* name, long offset, Section sectio
 	node->symbol.type = ST_SYMBOL;
 	node->symbol.sctype = sctype;
 	node->symbol.offset = offset;
-	node->section = section;
+	node->symbol.section = section;
 	node->symbol.num = tab->n++;
 	node->symbol.secNo = val;
 	node->next = NULL;
 
-	tab->last = tab->tail->next = node;
+	tab->tail = tab->tail->next = node;
 
 
 	return &node->symbol;
@@ -59,11 +60,10 @@ Symbol* addSection(SymbolTable* tab, long ndx, Section section ){
 			error("Memory allocation problem");
 
 		node->symbol.type = NON;
-		node->symbol.name = NULL;
 		node->symbol.sctype = LOCAL;
 		node->symbol.offset = 0;
 		node->symbol.num = 0;
-		node->symbol.section = NO_SECTION;
+		node->symbol.section = SEC_NO_SECTION;
 		
 		tab->tail = tab->head = node;
 		tab->head->next = NULL;
@@ -75,22 +75,22 @@ Symbol* addSection(SymbolTable* tab, long ndx, Section section ){
 	if(!node)
 		error("Memory allocation problem");
 
-	strcpy(node->symbol.name, name);
+	
 	node->symbol.type = ST_SECTION;
-	node->symbol.sctype = sctype;
+	node->symbol.sctype = LOCAL;
 	node->symbol.offset = 0;
-	node->section = section;
+	node->symbol.section = section;
 	node->symbol.num = tab->n++;
 	node->next = NULL;
-	node->symobol.secNo = node->symbol.num;
-	tab->last = tab->tail->next = node;
+	node->symbol.secNo = node->symbol.num;
+	tab->tail = tab->tail->next = node;
 
 
 	return &node->symbol;
 }
 
 Symbol* findSymbol(SymbolTable* tab, const char* name){
-	Symbol* temp = tab->head;
+	SymbolNode* temp = tab->head;
 
 	while(temp){
 		if(strcmp(temp->symbol.name, name))
@@ -99,11 +99,11 @@ Symbol* findSymbol(SymbolTable* tab, const char* name){
 	return NULL;
 }
 
-Symbol* findSection(SymbolTable* tab, Section sec){
-	Symbol* temp = tab->head;
+Symbol* findSection(SymbolTable* tab, long secNum){
+	SymbolNode* temp = tab->head;
 
 	while(temp){
-		if(temp->symbol.section == sec)
+		if(temp->symbol.secNo == secNum)
 			return &temp->symbol;
 	}
 	return NULL;
@@ -112,11 +112,11 @@ Symbol* findSection(SymbolTable* tab, Section sec){
 void deleteSymbolTable(SymbolTable *tab){
 	
 	while(tab->head){
-		Symbol* temp = tab->head;
-		tab->head = tab->head->next 
+		SymbolNode* temp = tab->head;
+		tab->head = tab->head->next ;
 		free(temp);
 	}
-	tab->last = NULL;
+	tab->tail = NULL;
 	tab->n = 0;
 }
 
@@ -136,11 +136,11 @@ int firstPass(Line* parsedFile){
 	end = 0;
 	currentLine = parsedFile;
 
-	while(!eof && line){
+	while(!end && currentLine){
 		if(currentLine->label != NULL){
 			Symbol *symbol = findSymbol(&tab, currentLine->label);
 			if(!symbol)
-				addSymbol(&tab, currentLine->label, cnt, currentSymbol->section, LOCAL,  currentSymbol->n );
+				addSymbol(&tab, currentLine->label, cnt, currentSymbol->section, LOCAL,  currentSymbol->num );
 			else if(symbol->secNo != 0)
 				error("mul def label");
 			else {
@@ -159,15 +159,15 @@ int firstPass(Line* parsedFile){
 				error("top few arguments to instruction");
 
 			if(currentLine->paramNo > 0){
-				Parameter* pram = currentLine->head;
-				if(currentLine->ins->addrType == DST && (param->ptype == IMMED_SYM || param->addrType == IMMED_CON))
+				Parameter* param = currentLine->params;
+				if(currentLine->ins->addrType == DST && (param->ptype == IMMED_SYM || param->ptype == IMMED_CON))
 					error("Not compatible addr type with ins");
 			
-				if(((param->ptype == REGIND_CON || param->ptype == REGIND_SYM) || (param->ptype == PCREL)) && (currentLine->ins->ins == CALL || is_substr(currentLine->ins->name, "JMP")))
+				if(((param->ptype == REGIND_CON || param->ptype == REGIND_SYM) || (param->ptype == PCREL)) && (currentLine->ins->ins == CALL || is_substr(currentLine->ins->ins_name, "JMP")))
 					error("JMP instruction with uncompatible addressing");
 
 				if(currentLine->paramNo > 1){
-					if(param->next->ptype == PCREL && !(currentLine->ins->ins == CALL || is_substr(currentLine->ins->name, "JMP")))
+					if(param->next->ptype == PCREL && !(currentLine->ins->ins == CALL || is_substr(currentLine->ins->ins_name, "JMP")))
 						error("pcrel with non jump func");
 
 				}
@@ -182,4 +182,5 @@ int firstPass(Line* parsedFile){
 		currentLine = currentLine -> next;
 		
 	}
-}	*/
+	return 0;
+}	

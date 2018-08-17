@@ -10,7 +10,7 @@
 
 
 static char* from_ptr = NULL;
-static int TOKEN_SIZE = 31;
+
 int line = 0;
 
 void delete_tokens(TokenNode* file){
@@ -25,81 +25,73 @@ void delete_tokens(TokenNode* file){
 
 }
 
-Token* getNextToken(){
-	Token* newToken = (Token*)malloc(sizeof(Token));
-	if(!newToken)
-		error("Error while allocating memory");
-	char* to_ptr;
+Token getNextToken(){
+	Token newToken ;
+
 	while(*from_ptr){
 		if(*from_ptr == ' ' || *from_ptr=='\t')
 			from_ptr++;
 	}
 
 	if(*from_ptr == '+')
-		newToken->token_type = PLUS;
+		newToken.token_type = T_PLUS;
 	else if(*from_ptr == '-')
-		newToken->token_type = MINUS;
+		newToken.token_type = T_MINUS;
 	else if(*from_ptr == '*')
-		newToken->token_type = ASTERISK;
+		newToken.token_type = T_ASTERISK;
 	else if(*from_ptr == '$')
-		newToken->token_type = DOLLAR;
+		newToken.token_type = T_DOLLAR;
 	else if(*from_ptr == ';'){
-		newToken->token_type = COMMENT;
+		newToken.token_type = T_COMMENT;
 		while(*from_ptr != '\n' && *from_ptr !='\0')
 			from_ptr++;
 	}
 	else if(*from_ptr == ':')
-		newToken->token_type = COLON;
+		newToken.token_type = T_COLON;
 	else if(*from_ptr == '&')
-		newToken->token_type = AMPERSAND;
+		newToken.token_type = T_AMPERSAND;
 	else if(*from_ptr == ',')
-		newToken->token_type = COMMA;
+		newToken.token_type = T_COMMA;
 	else if(*from_ptr == '[')
-		newToken->token_type = LBRACKET;
+		newToken.token_type = T_LBRACKET;
 	else if(*from_ptr == ']')
-		newToken->token_type = RBRACKET;
+		newToken.token_type = T_RBRACKET;
 	else if(*from_ptr == '\0')
-		newToken->token_type = EOF;
+		newToken.token_type = T_EOF;
 	else if(*from_ptr == '\n'){
-		newToken->token_type = NEWLINE;
+		newToken.token_type = T_NEWLINE;
 		line++;
 	}else{
-		Token* tok =(Token*) malloc(sizeof(Token));
-		tok->name = NULL;
-		tok->token_type = UNDEFINED;
-		 strcpy(*to_ptr, *from_ptr);
+			
 
-		if(!isalnum(*from_ptr) && *from_ptr!='_' && *from_ptr != '.'){
-			*to_ptr++ = '\0';
-			newToken =  tok;
+
+		if(!isalnum(*from_ptr) && *from_ptr != '_' && *from_ptr !='.'){
+			newToken.token_type  = T_UNDEFINED;
+			newToken.name[0] = '\0';
 		}
-
-		while(isalnum(*from_ptr) || *from_ptr == '_' || *from_ptr == '.'){
-			*to_ptr++ = *from_ptr++;
+		int i = 0;
+		while(isalnum(*(from_ptr++)) || *from_ptr == '_' || *from_ptr == '.')
+		{
+			newToken.name[i] = *from_ptr;
+			i++;
+			if(i >= 32)
+				error("max size literal reached");
 		}
-		*to_ptr++ ='\0';
+		newToken.name[i] = '\0';
 
-	
-		tok->name = to_ptr; ///????
-		to_ptr = NULL;
-		if(sizeof(tok))
-			tok->token_type = UNDEFINED;
+		if(isdigit(newToken.name[0])){
+			if(is_num_decimal(newToken.name)) newToken.token_type = T_LITERAL;
+		}
 		else{
-			if(isdigit(*tok->name)){
-				if(is_num_decimal(tok->name)) tok->token_type = LITERAL;
-				}else{
-					if(strlen(tok->name) > 31 ) tok->token_type = UNDEFINED;
-					else if(strlen(tok->name) > 7) tok->token_type =  SYMBOL;
-					else if(search_for_instruction(tok->name)!=NULL) tok->token_type = INSTRUCTION;
-					else if(search_for_directive(tok->name) != NULL) tok->token_type = DIRECTIVE;
-					else if(search_for_register(tok->name)!= NULL) tok->token_type = REGISTER;
-					else tok->token_type = SYMBOL;
-				}
+	        if (strlen(newToken.name) > 7) newToken.token_type = T_SYMBOL;
+	        else if (search_for_instruction(newToken.name) != NULL) newToken.token_type = T_INSTRUCTION;
+	        else if (search_for_directive(newToken.name) != NULL) newToken.token_type = T_DIRECTIVE;
+	        else if (search_for_register(newToken.name) != NULL) newToken.token_type = T_REGISTER;
+	        else newToken.token_type = T_SYMBOL;		
+
+	    }
+
 	}
-		newToken->name = tok->name;
-		newToken->token_type = tok->token_type;
-	}
-	++from_ptr;
 
 	return newToken;
 }
@@ -109,15 +101,15 @@ TokenNode* make_token_list(){
 	TokenNode *last = NULL;
 
 	while(1){
-		Token* nextTok = getNextToken();
+		Token nextTok = getNextToken();
 		TokenNode *node = NULL;
 		node = (TokenNode*) malloc(sizeof(TokenNode));
 		if(!node){
 			 error("Error while allocating memory!");
 			}
-		if(nextTok->token_type == EOF){
-			if(last->tok->token_type != NEWLINE){
-				nextTok->token_type = NEWLINE;
+		if(nextTok.token_type == T_EOF){
+			if(last->tok.token_type != T_NEWLINE){
+				nextTok.token_type = T_NEWLINE;
 				node->tok = nextTok;
 				last->next = node;
 				last = node;
@@ -126,7 +118,7 @@ TokenNode* make_token_list(){
 				free(node);
 		break;
 	}
-	if(nextTok->token_type == UNDEFINED)
+	if(nextTok.token_type == T_UNDEFINED)
 	{
 		error("Error: UNDEFINED token");
 	}

@@ -29,13 +29,13 @@ Buffer loadFromFile(const char* filename){
 	buff.buffersize = 0;
 
 	if(!filename) {
-		error("file does not exist");
+		error("file does not exist: L32,helper.c ");
 		return buff;
 	}
 	
 	FILE* file = fopen(filename, "r");
 	if(!file) {
-		error("File have not opened properly");
+		error("File have not opened properly: L38,helper.c");
 		return buff;
 	}
 	long size;
@@ -47,7 +47,7 @@ Buffer loadFromFile(const char* filename){
 	if(!filebuff)
 	{
 			fclose(file);
-			error("allocating problem");
+			error("allocating problemL L50, helper.c");
 			return buff;
 	}
 	
@@ -98,7 +98,7 @@ int is_substr(const char *str, const char *substr){
 //help to search tables
 
 
-Instruction* search_for_instruction(char* ins){
+const Instruction* search_for_instruction(char* ins){
 	int i = 0;
 	Instruction* instr = malloc(sizeof(Instruction));
 	instr->ins = NON;
@@ -111,7 +111,7 @@ Instruction* search_for_instruction(char* ins){
 	error("Instruction does not exist");
 	return instr;
 }
-Directive* search_for_directive(char* dir){
+const Directive* search_for_directive(char* dir){
 	int i = 0;
 	Directive* direct = malloc(sizeof(Directive));
 	direct->dirType = NONDEF;
@@ -126,7 +126,7 @@ Directive* search_for_directive(char* dir){
 	return direct;
 }
 
-char* search_for_register(char* reg){
+const char* search_for_register(char* reg){
 
 	int i = 0;
 

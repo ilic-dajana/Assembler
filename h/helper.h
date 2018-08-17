@@ -15,9 +15,9 @@ int is_substr(const char *str, const char *substr);
 
 // Table searches
 
-Instruction* search_for_instruction(char* ins);
-Directive* search_for_directive(char* dir);
-char* search_for_register(char* reg);
+const Instruction* search_for_instruction(char* ins);
+const Directive* search_for_directive(char* dir);
+const char* search_for_register(char* reg);
 
 //Cmd line arguments parsing
 

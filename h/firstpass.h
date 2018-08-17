@@ -1,4 +1,4 @@
-/*#ifndef _FIRSTPASS_H_
+#ifndef _FIRSTPASS_H_
 #define _FIRSTPASS_H_
 #include "data_types.h"
 //symbol table
@@ -56,4 +56,4 @@ void deleteSymbolTable(SymbolTable *tab);
 
 int firstPass(Line* parsedFile);
 
-#endif*/
+#endif

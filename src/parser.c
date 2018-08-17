@@ -1,4 +1,4 @@
-#include "parser.h"
+/*#include "parser.h"
 #include "data_types.h"
 #include "helper.h"
 #include "tables.h"
@@ -16,11 +16,10 @@ Token getNext(){
 	Token tok;
 	if(!globalToken)
 	{
-		tok.name = NULL;
 		tok.token_type = EOF;
 		return tok;
 	}else {
-		tok.name = globalToken->tok->name;
+		strcpy(tok.name , globalToken->tok->name);
 		tok.token_type = globalToken->tok->token_type;
 		globalToken = globalToken->next;
 	}
@@ -77,7 +76,7 @@ Parameter* getParameter(){
 		parameter->ptype = PCREL;
 		token = getNext();
 		if(checkTokenType(SYMBOL)){
-			parameter->symbol = token.name;
+			strcpy(parameter->symbol, token.name);
 			token = getNext();
 		}
 	}else if(token.token_type == ASTERISK){
@@ -92,21 +91,19 @@ Parameter* getParameter(){
 		parameter->value = checkIfCons(mark);
 	}else if(token.token_type == AMPERSAND){
 		parameter->ptype = IMMED_SYM;
-		parameter->symbol = token.name;
+		strcpy(parameter->symbol, token.name);
 		token = getNext();
 	}else if(token.token_type == SYMBOL){
 		parameter->ptype = MEMDIR_SYM;
-		parameter->symbol = token.name;
+		strcpy(parameter->symbol, token.name);
 		token = getNext();
 	}else if(token.token_type == PLUS){
 		mark = 1;
 		parameter->ptype = NOPARAM;
-		parameter->symbol = NULL;
 		token = getNext();
 	}else if(token.token_type == MINUS){
 		mark = -1;
 		parameter->ptype = NOPARAM;
-		parameter->symbol = NULL;
 		token = getNext();
 	}else if(token.token_type == LITERAL){
 		parameter->ptype = IMMED_CON;
@@ -123,12 +120,10 @@ Parameter* getParameter(){
 			if(token.token_type == PLUS){
 			mark = 1;
 			parameter->ptype = NOPARAM;
-			parameter->symbol = NULL;
 			token = getNext();
 		}else if(token.token_type == MINUS){
 			mark = -1;
 			parameter->ptype = NOPARAM;
-			parameter->symbol = NULL;
 			token = getNext();
 		}else if(token.token_type == LITERAL){
 			parameter->ptype = IMMED_CON;
@@ -136,7 +131,7 @@ Parameter* getParameter(){
 			}
 		}else if(token.token_type == SYMBOL){
 			parameter->ptype = MEMDIR_SYM;
-			parameter->symbol = token.name;
+			strcpy(parameter->symbol, token.name);
 			token = getNext();
 		}else
 			error("Unexpected token type");
@@ -187,7 +182,7 @@ void getParameters(){
 void getcurrent(Token token){
 
 	if(checkTokenType(SYMBOL)){
-		current->label = token.name;
+		strcpy(current->label, token.name);
 
 		token = getNext();
 
@@ -248,3 +243,4 @@ Line* parsing(TokenNode* tokenFile){
 	}
 	return head;
 }
+*/

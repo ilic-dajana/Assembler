@@ -13,24 +13,24 @@ typedef struct{
 // Token
 
 typedef enum {
-	UNDEFINED,
-	EOF,
-	NEWLINE,
-	INSTRUCTION,
-	REGISTER,
-	DIRECTIVE,
-	SYMBOL,
-	COMMENT,
-	LITERAL,
-	PLUS,
-	MINUS,
-	COMMA,
-	COLON,
-	DOLLAR,
-	LBRACKET,
-	RBRACKET,
-	AMPERSAND,
-	ASTERISK,
+	T_UNDEFINED = 0,
+	T_EOF,
+	T_NEWLINE,
+	T_INSTRUCTION,
+	T_REGISTER,
+	T_DIRECTIVE,
+	T_SYMBOL,
+	T_COMMENT,
+	T_LITERAL,
+	T_PLUS,
+	T_MINUS,
+	T_COMMA,
+	T_COLON,
+	T_DOLLAR,
+	T_LBRACKET,
+	T_RBRACKET,
+	T_AMPERSAND,
+	T_ASTERISK,
 }TokenType;
 
 
@@ -124,7 +124,7 @@ typedef struct
 {
 	char ins_name[32];
 	int paramNo;
-	Addressings addrType;
+	AddressingOp addrType;
 	InstructionSymbol ins;
 	Conditions cond;
 }Instruction;
@@ -165,7 +165,7 @@ typedef struct {
 } Token;
 
 typedef struct token {
-	Token* tok;
+	Token tok;
 	struct token *next;
 } TokenNode;
 
