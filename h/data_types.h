@@ -1,9 +1,7 @@
 #ifndef _DATA_TYPES_H_
 #define _DATA_TYPES_H_
 
-
-
-
+#define MAX_NAME_SIZE 32
 
 typedef struct{
 	char* buff;
@@ -113,7 +111,7 @@ typedef struct pnode
 	char is_long;
 	char regNo;
 	union{
-		char symbol[32];
+		char symbol[MAX_NAME_SIZE];
 		int value;
 	};
 	struct pnode *next;
@@ -122,7 +120,7 @@ typedef struct pnode
 
 typedef struct 
 {
-	char ins_name[32];
+	char ins_name[MAX_NAME_SIZE];
 	int paramNo;
 	AddressingOp addrType;
 	InstructionSymbol ins;
@@ -146,7 +144,7 @@ typedef enum{
 
 typedef struct lnode
 {
-	char label[32];
+	char label[MAX_NAME_SIZE];
 	union{
 		const Instruction* ins;
 		const Directive* dir;
@@ -160,7 +158,7 @@ typedef struct lnode
 
 
 typedef struct {
-	char name[32];
+	char name[MAX_NAME_SIZE];
 	TokenType token_type;
 } Token;
 

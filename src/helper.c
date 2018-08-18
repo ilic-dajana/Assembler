@@ -99,21 +99,18 @@ int is_substr(const char *str, const char *substr){
 
 const Instruction* search_for_instruction(char* ins){
 	int i = 0;
-	Instruction* instr = malloc(sizeof(Instruction));
-	instr->ins = NON;
+
 	while(i <= size_table_ins){
 		if(strcmp(ins, table_of_instructions[i].ins_name)==0)
 			return table_of_instructions + i;
 		else
 			i++;
 	}
-	error("Instruction does not exist");
-	return instr;
+	return NULL;
 }
 const Directive* search_for_directive(char* dir){
 	int i = 0;
-	Directive* direct = malloc(sizeof(Directive));
-	direct->dirType = NONDEF;
+
 
 	while(i <= size_table_dir){
 		if(strcmp(dir, table_of_directives[i].dir)==0)
@@ -121,20 +118,18 @@ const Directive* search_for_directive(char* dir){
 		else
 			i++;
 	}
-	error("Directive does not exist");
-	return direct;
+	return NULL;
 }
 
 const char* search_for_register(char* reg){
 
 	int i = 0;
 
-	while(i <= size_table_reg){
+	while(i < size_table_reg){
 		if(strcmp(reg, table_of_registers[i])==0)
 			return table_of_registers[i];
 		else
 			i++;
 	}
-	error("Regiester does not exist");
 	return NULL;
 }
