@@ -78,7 +78,6 @@ typedef enum {
 typedef enum {
 	NODEF,
 	SECTION,
-	START,
 	IMPORT_EXPORT,
 	D_EOF,
 	DATA,

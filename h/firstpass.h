@@ -46,7 +46,7 @@ extern SymbolNode* symbolTable;
 
 Symbol* addSymbol(SymbolTable* tab, const char* name, long offset, Section section, ScopeType sctype, long val );
 
-Symbol* addSection(SymbolTable* tab, long ndx, Section section);
+Symbol* addSection(SymbolTable* tab, const char* name);
 
 Symbol* findSymbol(SymbolTable* tab, const char* symbol);
 

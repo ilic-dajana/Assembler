@@ -119,10 +119,10 @@ Parameter* getParameter(){
         parameter->ptype = REGDIR;
         parameter->regNo = atoi(token.name + 1);
         token = getNext();
-
+        parameter->is_long = 0;
         if (checkTokenType(T_LBRACKET)){
             token = getNext();
-
+            parameter->is_long = 1;
             if (token.token_type == T_PLUS){
                 mark = 1;
                 parameter->ptype = NOPARAM;

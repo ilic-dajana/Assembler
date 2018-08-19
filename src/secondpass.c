@@ -1,9 +1,14 @@
-/*#include "secondpass.h"
+#include "secondpass.h"
 #include "data_types.h"
 #include "helper.h"
 #include "error.h"
 
 #include <stdlib.h>
+
+static int cnt;
+Symbol* currentSection;
+RelocationTable* tab;
+Line* currentLine;
 
 int addRecord(RelocationTable* tab, RelType type, long offset, int sym){
 	RelocationRecNode* node = (RelocationRecNode*) malloc(sizeof(RelocationRecNode));
@@ -41,5 +46,17 @@ void deleteRelocationTable(RelocationTable* tab, int ntabs){
 		tab->tail = NULL;
 		tab->cnt = 0;
 	}
+}
 
-}*/
+void secondPass(Line* parsedFile){
+	cnt = 0;
+	currentSection = NULL;
+	currentLine = NULL;
+
+	while(currentLine){
+		if(currentLine->type = O_INSTRUCTION){
+
+		}
+	}
+
+}

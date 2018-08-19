@@ -1,0 +1,3 @@
+/home/dajana/Desktop/SS_project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/dajana/Desktop/SS_project/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/dajana/Desktop/SS_project/cmake-build-debug/CMakeFiles/SS_project.dir
