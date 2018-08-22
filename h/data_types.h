@@ -64,7 +64,6 @@ typedef enum {
 	SHL = 0xD,
 	SHR = 0xE,
 	POP = 0xF,
-
 } InstructionSymbol;
 
 typedef enum {

@@ -1,6 +1,7 @@
 #ifndef _FIRSTPASS_H_
 #define _FIRSTPASS_H_
 #include "data_types.h"
+#include <stdio.h>
 //symbol table
 
 #define SYM_MAX  32
@@ -42,15 +43,14 @@ typedef struct symtab {
 	SymbolNode* tail;
 }SymbolTable;
 
-extern SymbolNode* symbolTable;
+extern SymbolTable* tab;
 
 Symbol* addSymbol(SymbolTable* tab, const char* name, long offset, Section section, ScopeType sctype, long val );
 
-Symbol* addSection(SymbolTable* tab, const char* name);
-
 Symbol* findSymbol(SymbolTable* tab, const char* symbol);
 
-Symbol* findSection(SymbolTable* tab, long secNum);
+void writeSymTabToFile(SymbolTable* tab, FILE* file);
+
 
 void deleteSymbolTable(SymbolTable *tab);
 

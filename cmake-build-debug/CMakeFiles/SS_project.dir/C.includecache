@@ -18,11 +18,13 @@ data_types.h
 data_types.h
 ../h/data_types.h
 
-../h/parser.h
+../h/secondpass.h
 data_types.h
 ../h/data_types.h
 
-/home/dajana/Desktop/SS_project/src/firstpass.c
+/home/dajana/Desktop/SS_project/src/secondpass.c
+secondpass.h
+/home/dajana/Desktop/SS_project/src/secondpass.h
 firstpass.h
 /home/dajana/Desktop/SS_project/src/firstpass.h
 data_types.h
@@ -31,10 +33,6 @@ helper.h
 /home/dajana/Desktop/SS_project/src/helper.h
 error.h
 /home/dajana/Desktop/SS_project/src/error.h
-parser.h
-/home/dajana/Desktop/SS_project/src/parser.h
 stdlib.h
--
-string.h
 -
 

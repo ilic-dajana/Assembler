@@ -20,6 +20,8 @@ const Directive* search_for_directive(char* dir);
 const char* search_for_register(char* reg);
 
 //Cmd line arguments parsing
+extern char* outfile;
+extern char* infile;
 
 void parseArg(int argc, char* argv[]);
 #endif

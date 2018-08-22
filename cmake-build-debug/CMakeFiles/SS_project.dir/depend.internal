@@ -49,7 +49,9 @@ CMakeFiles/SS_project.dir/src/parser.c.o
 CMakeFiles/SS_project.dir/src/secondpass.c.o
  ../h/data_types.h
  ../h/error.h
+ ../h/firstpass.h
  ../h/helper.h
+ ../h/secondpass.h
  /home/dajana/Desktop/SS_project/src/secondpass.c
 CMakeFiles/SS_project.dir/src/tables.c.o
  ../h/data_types.h

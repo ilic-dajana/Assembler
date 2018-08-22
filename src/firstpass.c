@@ -10,7 +10,6 @@
 #define WORD 2
 #define LONG 4
 
-static SymbolTable tab;
 static Symbol *currentDirective;
 static long cnt;
 static long end;
@@ -19,18 +18,18 @@ static Line* currentLine;
 Symbol* addSymbol(SymbolTable* tab,const char* name, long offset, Section section, ScopeType sctype, long val){
 
 	if(!tab->head){
-		SymbolNode* node = (SymbolNode*) malloc(sizeof(SymbolNode));
+		tab->head = (SymbolTable*) malloc(sizeof(SymbolTable));
 		
-		if(!node)
+		if(!tab->head)
 			error("Memory allocation problem");
 
-		node->symbol.type = NON;		
-		node->symbol.sctype = LOCAL;
-		node->symbol.offset = 0;
-		node->symbol.num = 0;
-		node->symbol.section = SEC_NO_SECTION;
+        tab->head->symbol.type = NON;
+        tab->head->symbol.sctype = LOCAL;
+        tab->head->symbol.offset = 0;
+        tab->head->symbol.num = 0;
+        tab->head->symbol.section = SEC_NO_SECTION;
 
-		tab->tail = tab->head = node;
+		tab->tail = tab->head ;
 		tab->head->next = NULL;
 		tab->n = 1;
 	}
@@ -50,48 +49,11 @@ Symbol* addSymbol(SymbolTable* tab,const char* name, long offset, Section sectio
 	node->next = NULL;
 
 	tab->tail = tab->tail->next = node;
-
-
-	return &node->symbol;
-}
-
-Symbol* addSection(SymbolTable* tab, const char* name ){
-
-	if(!tab->head){
-		SymbolNode* node = (SymbolNode*) malloc(sizeof(SymbolNode));
-		
-		if(!node)
-			error("Memory allocation problem");
-
-		node->symbol.type = NON;
-		node->symbol.sctype = LOCAL;
-		node->symbol.offset = 0;
-		node->symbol.num = 0;
-		node->symbol.section = SEC_NO_SECTION;
-		
-		tab->tail = tab->head = node;
-		tab->head->next = NULL;
-		tab->n = 1;
-	}
-
-	SymbolNode* node = (SymbolNode*) malloc(sizeof(SymbolNode));
-
-	if(!node)
-		error("Memory allocation problem");
-
-	strcpy(node->symbol.name, name);
-	node->symbol.type = ST_SECTION;
-	node->symbol.sctype = LOCAL;
-	node->symbol.offset = 0;
-//	node->symbol.section = section;
-	node->symbol.num = tab->n++;
-	node->next = NULL;
-	node->symbol.secNo = node->symbol.num;
-	tab->tail = tab->tail->next = node;
-
+    tab->tail = NULL;
 
 	return &node->symbol;
 }
+
 
 Symbol* findSymbol(SymbolTable* tab, const char* name){
 	SymbolNode* temp = tab->head;
@@ -103,14 +65,35 @@ Symbol* findSymbol(SymbolTable* tab, const char* name){
 	return NULL;
 }
 
-Symbol* findSection(SymbolTable* tab, long secNum){
-	SymbolNode* temp = tab->head;
+void writeSymTabToFile(SymbolTable* tab, FILE* file){
+	SymbolNode* temp = NULL;
 
-	while(temp){
-		if(temp->symbol.secNo == secNum)
-			return &temp->symbol;
+	fprintf(file, "### SYMBOL TABLE ###\n");
+	int i =0;
+	for(temp = tab->head; temp; temp = temp->next, i++){
+        Symbol sym = temp->symbol;
+        char type[9];
+        char scope[6];
+        switch(sym.type){
+            case ST_SECTION: strcpy(type, "SECTION");
+            break;
+            case ST_SYMBOL: strcpy(type, "SYMBOL");
+            break;
+            case ST_NON: strcpy(type, "UNDEFINED");
+            break;
+        }
+        switch(sym.sctype){
+            case GLOBAL: strcpy(scope, "GLOBAL");
+            break;
+            case LOCAL: strcpy(scope, "LOCAL");
+            break;
+        }
+
+        fprintf(file, "%d %ld %s %s %ld %ld %s \n", i, sym.num, sym.name, type,  sym.secNo, sym.offset, scope )
+
 	}
-	return NULL;
+    fprintf(file, "\n");
+
 }
 
 void deleteSymbolTable(SymbolTable *tab){
@@ -149,7 +132,7 @@ int firstPass(Line* parsedFile){
 	tab.tail = NULL;
 	tab.n = 0;
 	currentDirective = NULL;
-
+	tab = NULL;
 	end = 0;
 	currentLine = parsedFile;
 
@@ -197,7 +180,7 @@ int firstPass(Line* parsedFile){
 			if(currentLine->dir->dirType == SECTION){
 				if(findSymbol(&tab, currentLine->dir->dir))
 					error("Multiple def same directive L199, firstpass.c");
-				addSection(&tab, currentLine->dir->dir);
+				addSymbol(&tab, currentLine->dir->dir);
 				currentDirective = findSymbol(&tab, currentLine->dir->dir);
 				cnt = 0;
 			}
@@ -228,11 +211,21 @@ int firstPass(Line* parsedFile){
 			}
 			else if(currentLine->dir->dirType == SKIP){
 				if(currentLine->paramNo != 1 || currentLine->params->ptype != IMMED_CON)
-					error(("Invalid operation (L230, firstpass.c)"));
+					error("Invalid operation (L230, firstpass.c)");
 				cnt += currentLine->params->value;
 			}
+			else if(currentLine->dir->dirType == D_EOF){
+			    end = 1;
+			}
+			else if(currentLine->dir->dirType == ALIGN){
+			    if(currentLine->paramNo != 1 || currentLine->params->ptype != IMMED_CON)
+			        error("Invalid operation (L239, firstpass.c");
+                int n = currentLine->params->value;
+                unsigned int toalign = (0x0001 << n);
+                while(cnt & toalign)
+                    cnt++;
+			}
 		}
-
 		currentLine = currentLine -> next;
 	}
 	return 0;

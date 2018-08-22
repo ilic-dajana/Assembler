@@ -1,5 +1,3 @@
-
-
 #include "helper.h"
 #include "data_types.h"
 #include "tables.h"
@@ -9,18 +7,41 @@
 #include <string.h>
 #include <ctype.h>
 #include <argp.h>
+#include <getopt.h>
 
-/*
-		char* args_a = "INPUT OUTPUT";
-		struct argp_option options[] = {
-			{"input_file", 'i',0 , 0,  "input file name"},
-			{"address", 'a', "ADDR", 0, "start addr"},
-			{"output_file", 'o', 0, 0, "output file"}
-		};
-		struct argp argp = {options, parseArgs , args_a, 0, 0, 0};
-		argp_parse(&argp, argc, argv, 0, 0, &argv);
+//parser cmd line
+
+
+
+
+void parseArg(int argc, char* argv[]){
+	int c;
+	int iflag;
+	int oflag;
+
+	while((c = getopt(argc, argv, "i:u")) != -1){
+	    switch(c){
+	        case 'i': infile = optarg;
+	        break;
+	        case 'o': outfile = optarg;
+	        break;
+            case '?':
+                if (optopt == 'i' || optopt == 'o')
+                    fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+                else if (isprint (optopt))
+                    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+                else
+                    fprintf (stderr,
+                             "Unknown option character `\\x%x'.\n",
+                             optopt);
+                exit(1);
+            default:
+                abort();
+            break;
+	    }
+	}
+
 }
-*/
 
 Buffer loadFromFile(const char* filename){
 	Buffer buff ;

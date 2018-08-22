@@ -2,7 +2,7 @@
 #define _SECONDPASS_H_
 
 #include "data_types.h"
-
+#include <stdio.h>
 typedef enum{
  	REL_16,
  	RELPC_16,
@@ -26,6 +26,10 @@ typedef struct{
 	long cnt;
 	long sec;
 }RelocationTable;
+
+extern RelocationTable *reltab;
+
+void writeRelTabToFIle(FILE* file, RelocationTable* reltab);
 
 int addRecord(RelocationTable* tab, RelType type, long offset, int sym);
 
