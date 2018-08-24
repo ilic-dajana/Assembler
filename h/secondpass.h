@@ -3,6 +3,10 @@
 
 #include "data_types.h"
 #include <stdio.h>
+#include "firstpass.h"
+
+#define MAX_SEC 4
+
 typedef enum{
  	REL_16,
  	RELPC_16,
@@ -11,7 +15,7 @@ typedef enum{
 typedef struct{
 	RelType type;
 	long offset;
-	int rel_num;
+	long rel_num;
 	int sym_num;
 }RelocationRec;
 
@@ -27,11 +31,14 @@ typedef struct{
 	long sec;
 }RelocationTable;
 
-extern RelocationTable *reltab;
+RelocationTable *currreltab;
+RelocationTable reltabls[MAX_SEC];
 
-void writeRelTabToFIle(FILE* file, RelocationTable* reltab);
+int secN;
 
-int addRecord(RelocationTable* tab, RelType type, long offset, int sym);
+void writeRelTabToFIle(FILE* file, int tabN, RelocationTable* reltab, SymbolTable* tab);
+
+void addRecord(RelocationTable* tab, RelType type, long offset, int sym);
 
 void deleteRelocationTable(RelocationTable* tab, int ntabs);
 

@@ -12,23 +12,14 @@ typedef enum{
 	ST_NON,
 } SymbolType;
 
-typedef enum{
-	SEC_NO_SECTION,
-	SEC_TEXT,
-	SEC_DATA,
-	SEC_RODATA,
-	SEC_BSS,
-	SEC_END,
-} Section;
 
 typedef struct 
 {
 	SymbolType type;
 	char name[SYM_MAX];
 	ScopeType sctype;
-	long offset;
-	long num;
-	Section section;
+	long val;
+	int num;
 	long secNo;
 }Symbol;
 
@@ -43,16 +34,18 @@ typedef struct symtab {
 	SymbolNode* tail;
 }SymbolTable;
 
-extern SymbolTable* tab;
+SymbolTable* tab;
 
-Symbol* addSymbol(SymbolTable* tab, const char* name, long offset, Section section, ScopeType sctype, long val );
+Symbol* addSymbol(SymbolTable* tab, const char* name,long secNo, ScopeType sctype, long val );
+Symbol* addSection(SymbolTable* tab, const char* name);
 
 Symbol* findSymbol(SymbolTable* tab, const char* symbol);
+Symbol* findSection(SymbolTable* tab, long secNo);
 
 void writeSymTabToFile(SymbolTable* tab, FILE* file);
 
-
 void deleteSymbolTable(SymbolTable *tab);
+int sizeofinstruction();
 
 int firstPass(Line* parsedFile);
 

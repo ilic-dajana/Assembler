@@ -13,6 +13,8 @@
 ../h/firstpass.h
 data_types.h
 ../h/data_types.h
+stdio.h
+-
 
 ../h/helper.h
 data_types.h
@@ -21,6 +23,10 @@ data_types.h
 ../h/secondpass.h
 data_types.h
 ../h/data_types.h
+stdio.h
+-
+firstpass.h
+../h/firstpass.h
 
 /home/dajana/Desktop/SS_project/src/secondpass.c
 secondpass.h
@@ -33,6 +39,8 @@ helper.h
 /home/dajana/Desktop/SS_project/src/helper.h
 error.h
 /home/dajana/Desktop/SS_project/src/error.h
+string.h
+-
 stdlib.h
 -
 

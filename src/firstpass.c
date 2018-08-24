@@ -10,57 +10,86 @@
 #define WORD 2
 #define LONG 4
 
-static Symbol *currentDirective;
 static long cnt;
 static long end;
 static Line* currentLine;
+Symbol* currentDirective;
+extern SymbolTable* tab;
 
-Symbol* addSymbol(SymbolTable* tab,const char* name, long offset, Section section, ScopeType sctype, long val){
-
-	if(!tab->head){
-		tab->head = (SymbolTable*) malloc(sizeof(SymbolTable));
-		
-		if(!tab->head)
-			error("Memory allocation problem");
-
-        tab->head->symbol.type = NON;
-        tab->head->symbol.sctype = LOCAL;
-        tab->head->symbol.offset = 0;
-        tab->head->symbol.num = 0;
-        tab->head->symbol.section = SEC_NO_SECTION;
-
-		tab->tail = tab->head ;
-		tab->head->next = NULL;
-		tab->n = 1;
-	}
+Symbol* addSymbol(SymbolTable* tab,const char* name, long secNo, ScopeType sctype, long val){
 
 	SymbolNode* node = (SymbolNode*) malloc(sizeof(SymbolNode));
 
 	if(!node)
 		error("Memory allocation problem");
 
+    if(tab->head == NULL){
+        tab->head = node;
+        tab->tail = node;
+    }
+    else
+        tab->tail = tab->tail->next = node;
+
 	strcpy(node->symbol.name, name);
 	node->symbol.type = ST_SYMBOL;
 	node->symbol.sctype = sctype;
-	node->symbol.offset = offset;
-	node->symbol.section = section;
 	node->symbol.num = tab->n++;
-	node->symbol.secNo = val;
+	node->symbol.secNo = secNo;
+	node->symbol.val = val;
 	node->next = NULL;
 
-	tab->tail = tab->tail->next = node;
-    tab->tail = NULL;
+	return &node->symbol;
+}
+Symbol* addSection(SymbolTable* tab, const char* name) {
+
+	SymbolNode* node = (SymbolNode*) malloc(sizeof(SymbolNode));
+
+	if(!node)
+		error("Memory allocation problem");
+
+    if(tab->head == NULL){
+        tab->head = node;
+        tab->tail = node;
+    }
+    else
+        tab->tail = tab->tail->next = node;
+
+    strcpy(node->symbol.name, name);
+	node->symbol.type = ST_SECTION;
+	node->symbol.num = (tab->n)++;
+	node->symbol.secNo = node->symbol.num;
+	node->symbol.sctype = LOCAL;
+	node->symbol.val = 0;
+	node->next = NULL;
+
 
 	return &node->symbol;
 }
 
 
 Symbol* findSymbol(SymbolTable* tab, const char* name){
+    if(tab == NULL)
+        return NULL;
+
 	SymbolNode* temp = tab->head;
 
 	while(temp){
-		if(strcmp(temp->symbol.name, name))
+		if(strcmp(temp->symbol.name, name)==0)
 			return &temp->symbol;
+		temp = temp->next;
+	}
+	return NULL;
+}
+
+Symbol* findSection(SymbolTable* tab, long secNo) {
+    if(tab == NULL)
+        return NULL;
+	SymbolNode* temp = tab->head;
+
+	while(temp) {
+		if(temp->symbol.secNo == secNo && temp->symbol.type == ST_SECTION)
+			return &temp->symbol;
+		temp=temp->next;
 	}
 	return NULL;
 }
@@ -69,11 +98,12 @@ void writeSymTabToFile(SymbolTable* tab, FILE* file){
 	SymbolNode* temp = NULL;
 
 	fprintf(file, "### SYMBOL TABLE ###\n");
+	fprintf(file, "%10s%20s%10s%10s%10s%10s\n", "INDEX", "NAME", "TYPE", "SECTION", "VALUE", "LOKAL?");
 	int i =0;
 	for(temp = tab->head; temp; temp = temp->next, i++){
         Symbol sym = temp->symbol;
-        char type[9];
-        char scope[6];
+        char type[10];
+        char scope[7];
         switch(sym.type){
             case ST_SECTION: strcpy(type, "SECTION");
             break;
@@ -89,11 +119,10 @@ void writeSymTabToFile(SymbolTable* tab, FILE* file){
             break;
         }
 
-        fprintf(file, "%d %ld %s %s %ld %ld %s \n", i, sym.num, sym.name, type,  sym.secNo, sym.offset, scope )
+        fprintf(file, "%10d%20s%10s%10ld%10ld%10s\n", sym.num, sym.name, type,  sym.secNo, sym.val, scope);
 
 	}
-    fprintf(file, "\n");
-
+    fputc('\n', file);
 }
 
 void deleteSymbolTable(SymbolTable *tab){
@@ -107,81 +136,87 @@ void deleteSymbolTable(SymbolTable *tab){
 	tab->n = 0;
 }
 
-long sizeofinstruction(){
+int sizeofinstruction(){
 
-		if(currentLine->params->is_long == 1 || (currentLine->params->next && currentLine->params->next->is_long == 1)
-			|| (is_substr(currentLine->ins->ins_name, "HALT")) || !(is_substr(currentLine->ins->ins_name, "JMP")))
-			return LONG;
-		else{
-			if(is_substr(currentLine->ins->ins_name, "JMP")){
-				if(currentLine->params->ptype == REGIND_CON || currentLine->params->ptype == REGIND_SYM)
-					return WORD + LONG;
-				if(currentLine->params->ptype==PCREL || currentLine->params->ptype==MEMDIR_CON || currentLine->params->ptype==MEMDIR_SYM || currentLine->params->ptype==PCREL)
-					return LONG;
-				if(currentLine->params->ptype==REGDIR)
-					return WORD;
-				}
-			}
-
+		if(is_substr(currentLine->ins->ins_name, "RET")) {
+			return WORD;
+		}
+		else if(is_substr(currentLine->ins->ins_name, "JMP")) {
+			if(currentLine->params->ptype == REGIND_CON || currentLine->params->ptype == REGIND_SYM)
+				return WORD + LONG;
+			if(currentLine->params->ptype == PCREL || currentLine->params->ptype == REGIND_SYM)
+				return LONG;
+			if(currentLine->params->ptype == REGDIR)
+				return WORD;
+		}
+		else {
+			if((currentLine->params && currentLine->params->is_long == 1) || (currentLine->params->next && currentLine->params->next->is_long == 1))
+				return LONG;
+			else
+				return WORD;
+		}
 	return 0;
 }
 
 int firstPass(Line* parsedFile){
 	cnt = 0;
-	tab.head = NULL;
-	tab.tail = NULL;
-	tab.n = 0;
+	tab = (SymbolTable*) malloc(sizeof(SymbolTable));
+	tab->head = NULL;
+	tab->tail = NULL;
+	tab->n = 1;
 	currentDirective = NULL;
-	tab = NULL;
 	end = 0;
 	currentLine = parsedFile;
 
 	while(!end && currentLine){
-		if((currentLine->label) != NULL){
-			Symbol *symbol = findSymbol(&tab, currentLine->label);
+		// LABEL PASS
+		if(currentLine->label[0] != '\0'){
+			if(!currentDirective)
+				error("UNDEFINED SECTION (L167, firstpass.c");
+
+			Symbol *symbol = findSymbol(tab, currentLine->label);
+
 			if(!symbol)
-				addSymbol(&tab, currentLine->label, cnt, currentDirective->section, LOCAL,  currentDirective->num );
+				addSymbol(tab, currentLine->label, currentDirective->secNo, LOCAL, cnt);
 			else if(symbol->secNo != 0)
 				error("mul def label");
 			else {
 				symbol->secNo = currentDirective->secNo;
-				symbol->offset = cnt;
+				symbol->val = cnt;
 			}
-
 		}
-
+		//INSTRUCTION PASS
 		if(currentLine->type == O_INSTRUCTION){
 
 			if(!currentDirective)
-				error("Unrecognized section");
+				error("Unrecognized section (L186, firstpass)");
 
 			if(currentLine->paramNo != currentLine->ins->paramNo )
-				error("top few arguments to instruction");
+				error("Too few arguments for instruction(L188, firstpass)");
 
 			if(currentLine->paramNo > 0){
 				Parameter* param = currentLine->params;
 				if(currentLine->ins->addrType == DST && (param->ptype == IMMED_SYM || param->ptype == IMMED_CON))
-					error("Not compatible addr type with ins");
+					error("Not compatible addr type with instruction (L193,firstpass)");
 			
-				if(((param->ptype == REGIND_CON || param->ptype == REGIND_SYM) || (param->ptype == PCREL)) && (currentLine->ins->ins == CALL || is_substr(currentLine->ins->ins_name, "JMP")))
-					error("JMP instruction with uncompatible addressing");
-
+				if( (param->ptype == PCREL) && !(currentLine->ins->ins == CALL || is_substr(currentLine->ins->ins_name, "JMP")))
+					error("Instruction with incompatible addressing(L196, firstpass)");
+				if((param->ptype == REGIND_CON || param->ptype == REGIND_SYM) && (currentLine->ins->ins == CALL || is_substr(currentLine->ins->ins_name, "JMP")))
+					error("JMP instruction with incompatible addressing(L196, firstpass)");
 				if(currentLine->paramNo > 1){
-					if(param->next->ptype == PCREL && !(currentLine->ins->ins == CALL || is_substr(currentLine->ins->ins_name, "JMP")))
-						error("pcrel with non jump func");
-
+					if((param->next->ptype == PCREL && !(currentLine->ins->ins == CALL || is_substr(currentLine->ins->ins_name, "JMP"))) || (param->is_long ==1 && param->next->is_long == 1))
+						error("Instruction failed (L200, firstpass)");
 				}
 			}
-
 			cnt += sizeofinstruction();
 		}
-
+		//DIRECTIVE PASS
 		if(currentLine->type == O_DIRECTIVE){
 			if(currentLine->dir->dirType == SECTION){
-				if(findSymbol(&tab, currentLine->dir->dir))
+				if(findSymbol(tab, currentLine->dir->dir))
 					error("Multiple def same directive L199, firstpass.c");
-				addSymbol(&tab, currentLine->dir->dir);
-				currentDirective = findSymbol(&tab, currentLine->dir->dir);
+				addSection(tab, currentLine->dir->dir);
+				currentDirective = findSymbol(tab, currentLine->dir->dir);
 				cnt = 0;
 			}
 			else if(currentLine->dir->dirType == IMPORT_EXPORT){
@@ -189,11 +224,11 @@ int firstPass(Line* parsedFile){
 					while(temp){
 						if(temp->ptype != MEMDIR_SYM)
 							error("Invalid operand(L208, firstpass.c)");
-						Symbol* s = findSymbol(&tab, temp->symbol);
+						Symbol* s = findSymbol(tab, temp->symbol);
 						if(s)
 							s->sctype = GLOBAL;
 						else
-							addSymbol(&tab, temp->symbol, 0, currentDirective->section, GLOBAL,0 );
+							addSymbol(tab, temp->symbol,  0, GLOBAL , 0);
 						temp = temp->next;
 					}
 			}
@@ -207,7 +242,7 @@ int firstPass(Line* parsedFile){
 					else if(strcmp(currentLine->dir->dir, "DWORD") == 0 || strcmp(currentLine->dir->dir, ".LONG"))
 						size = 4;
 
-					cnt = size * n;
+					cnt += size * n;
 			}
 			else if(currentLine->dir->dirType == SKIP){
 				if(currentLine->paramNo != 1 || currentLine->params->ptype != IMMED_CON)
@@ -221,7 +256,7 @@ int firstPass(Line* parsedFile){
 			    if(currentLine->paramNo != 1 || currentLine->params->ptype != IMMED_CON)
 			        error("Invalid operation (L239, firstpass.c");
                 int n = currentLine->params->value;
-                unsigned int toalign = (0x0001 << n);
+                unsigned int toalign =(unsigned int) ~(~0x0000 << n);
                 while(cnt & toalign)
                     cnt++;
 			}

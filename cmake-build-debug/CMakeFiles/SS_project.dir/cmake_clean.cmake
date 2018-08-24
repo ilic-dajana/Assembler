@@ -8,6 +8,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/SS_project.dir/src/parser.c.o"
   "CMakeFiles/SS_project.dir/src/secondpass.c.o"
   "CMakeFiles/SS_project.dir/src/tables.c.o"
+  "CMakeFiles/SS_project.dir/src/code.c.o"
   "SS_project.pdb"
   "SS_project"
 )

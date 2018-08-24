@@ -4,6 +4,10 @@
 #include "lexer.h"
 #include "data_types.h"
 #include "parser.h"
+#include "code.h"
+
+char* infile;
+char* outfile;
 
 int main(int argc, char* argv[]){
 
@@ -73,8 +77,8 @@ int main(int argc, char* argv[]){
 
     //parser test
 
-    Line* curr = parsing(tf);
-
+    Line* parsedFile = parsing(tf);
+    Line* curr = parsedFile;
     while (curr)
     {
         putchar('{'); putchar('\n');
@@ -145,5 +149,7 @@ int main(int argc, char* argv[]){
         putchar('}'); putchar(','); putchar('\n');
         curr = curr->next;
     }
+
+    programCode(parsedFile , "output.txt");
 
 }

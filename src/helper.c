@@ -11,19 +11,15 @@
 
 //parser cmd line
 
-
-
+extern char* outfile;
+extern char *infile;
 
 void parseArg(int argc, char* argv[]){
 	int c;
-	int iflag;
-	int oflag;
-
-	while((c = getopt(argc, argv, "i:u")) != -1){
+	//program call: asm -o outfilename infilename
+	while((c = getopt(argc, argv, "o:")) != -1){
 	    switch(c){
-	        case 'i': infile = optarg;
-	        break;
-	        case 'o': outfile = optarg;
+	        case 'o': infile = optarg;
 	        break;
             case '?':
                 if (optopt == 'i' || optopt == 'o')
@@ -37,9 +33,13 @@ void parseArg(int argc, char* argv[]){
                 exit(1);
             default:
                 abort();
-            break;
 	    }
 	}
+	if(optind == argc)
+		error("Must enter input file");
+	infile = argv[optind];
+	if(++optind < argc)
+		error("Just one input file is allowed");
 
 }
 

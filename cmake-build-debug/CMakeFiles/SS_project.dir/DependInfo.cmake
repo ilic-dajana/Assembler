@@ -4,6 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
+  "/home/dajana/Desktop/SS_project/src/code.c" "/home/dajana/Desktop/SS_project/cmake-build-debug/CMakeFiles/SS_project.dir/src/code.c.o"
   "/home/dajana/Desktop/SS_project/src/error.c" "/home/dajana/Desktop/SS_project/cmake-build-debug/CMakeFiles/SS_project.dir/src/error.c.o"
   "/home/dajana/Desktop/SS_project/src/firstpass.c" "/home/dajana/Desktop/SS_project/cmake-build-debug/CMakeFiles/SS_project.dir/src/firstpass.c.o"
   "/home/dajana/Desktop/SS_project/src/helper.c" "/home/dajana/Desktop/SS_project/cmake-build-debug/CMakeFiles/SS_project.dir/src/helper.c.o"

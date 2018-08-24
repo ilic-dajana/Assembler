@@ -208,6 +208,8 @@ void getcurrent(){
 
 	if(checkTokenType(T_NEWLINE))
 		token = getNext();
+	else if( current->type == O_LABEL)
+		return;
 	else
 		error("Unexpected token(L212, parser.c)");
 }

@@ -123,6 +123,33 @@ SS_project/fast:
 	$(MAKE) -f CMakeFiles/SS_project.dir/build.make CMakeFiles/SS_project.dir/build
 .PHONY : SS_project/fast
 
+src/code.o: src/code.c.o
+
+.PHONY : src/code.o
+
+# target to build an object file
+src/code.c.o:
+	$(MAKE) -f CMakeFiles/SS_project.dir/build.make CMakeFiles/SS_project.dir/src/code.c.o
+.PHONY : src/code.c.o
+
+src/code.i: src/code.c.i
+
+.PHONY : src/code.i
+
+# target to preprocess a source file
+src/code.c.i:
+	$(MAKE) -f CMakeFiles/SS_project.dir/build.make CMakeFiles/SS_project.dir/src/code.c.i
+.PHONY : src/code.c.i
+
+src/code.s: src/code.c.s
+
+.PHONY : src/code.s
+
+# target to generate assembly for a file
+src/code.c.s:
+	$(MAKE) -f CMakeFiles/SS_project.dir/build.make CMakeFiles/SS_project.dir/src/code.c.s
+.PHONY : src/code.c.s
+
 src/error.o: src/error.c.o
 
 .PHONY : src/error.o
@@ -375,6 +402,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... SS_project"
+	@echo "... src/code.o"
+	@echo "... src/code.i"
+	@echo "... src/code.s"
 	@echo "... src/error.o"
 	@echo "... src/error.i"
 	@echo "... src/error.s"

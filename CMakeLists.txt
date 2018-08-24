@@ -14,6 +14,7 @@ add_executable(SS_project
     h/parser.h
     h/secondpass.h
     h/tables.h
+    h/code.h
     src/error.c
     src/firstpass.c
     src/helper.c
@@ -22,4 +23,6 @@ add_executable(SS_project
     src/main.c
     src/parser.c
     src/secondpass.c
-    src/tables.c)
+    src/tables.c
+    src/code.c
+    )

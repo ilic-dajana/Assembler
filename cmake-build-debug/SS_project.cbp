@@ -80,6 +80,9 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/home/dajana/Desktop/SS_project/h/code.h">
+			<Option target="SS_project"/>
+		</Unit>
 		<Unit filename="/home/dajana/Desktop/SS_project/h/data_types.h">
 			<Option target="SS_project"/>
 		</Unit>
@@ -102,6 +105,9 @@
 			<Option target="SS_project"/>
 		</Unit>
 		<Unit filename="/home/dajana/Desktop/SS_project/h/tables.h">
+			<Option target="SS_project"/>
+		</Unit>
+		<Unit filename="/home/dajana/Desktop/SS_project/src/code.c">
 			<Option target="SS_project"/>
 		</Unit>
 		<Unit filename="/home/dajana/Desktop/SS_project/src/error.c">
