@@ -117,7 +117,7 @@ UINT getEndParam(Parameter* param, UINT* begin, int offset){
 
 	if(param->ptype == IMMED_CON) {
 		*begin |= IMMED << offset;
-		end |= param->value;
+		end = param->value;
 	}
 	else if(param->ptype == IMMED_SYM) {
 		*begin |= IMMED << offset;
@@ -181,19 +181,20 @@ void pseudoIns(UINT* begin, UINT* end) {
 		*begin |= currentLine->ins->cond << 14;
 		*begin |= (((currentLine->params->ptype == PCREL) ? 0x0 : 0xd) << 10);
 		*begin |= ((REGDIR << 8) | (0x7 << 5));
-
-		if(currentLine->params->ptype == A_REGDIR)
-			*begin |= ((A_REGDIR << 3) | (currentLine->params->regNo));
-		else if(currentLine->params->ptype == MEMDIR_CON) {
-			currentLine->params->ptype = IMMED_CON;
-			*end = getEndParam(currentLine->params, begin, 3);
+        Parameter param = *currentLine->params;
+        param.next = NULL;
+		if(param.ptype == A_REGDIR)
+			*begin |= ((A_REGDIR << 3) | (param.regNo));
+		else if(param.ptype == MEMDIR_CON) {
+			param.ptype = IMMED_CON;
+			*end = getEndParam(&param, begin, 3);
 		}
-		else if(currentLine->params->ptype == MEMDIR_SYM) {
-			currentLine->params->ptype = IMMED_SYM;
-			*end = getEndParam(currentLine->params, begin, 3);
+		else if(param.ptype == MEMDIR_SYM) {
+			param.ptype = IMMED_SYM;
+			*end = getEndParam(&param, begin, 3);
 		}
-		else if(currentLine->params->ptype == PCREL) {
-			Symbol* sym = findSymbol(tab, currentLine->params->symbol);
+		else if(param.ptype== PCREL) {
+			Symbol* sym = findSymbol(tab, param.symbol);
 			if(sym == NULL)
 				error("Symbol not found");
 			*begin |= IMMED << 3;
@@ -273,7 +274,7 @@ void secondPass(Line* parsedFile){
 			else {
 					pseudoIns(&begin, &end);
 			}
-			cnt += sizeOfinstruction();
+        cnt += sizeOfinstruction();
 		}
 		else if(currentLine->type == O_DIRECTIVE){
 
