@@ -144,7 +144,8 @@ int sizeofinstruction(){
 		else if(is_substr(currentLine->ins->ins_name, "JMP")) {
 			if(currentLine->params->ptype == REGIND_CON || currentLine->params->ptype == REGIND_SYM)
 				return WORD + LONG;
-			if(currentLine->params->ptype == PCREL || currentLine->params->ptype == REGIND_SYM)
+			if(currentLine->params->ptype == PCREL || currentLine->params->ptype == MEMDIR_SYM
+			    || currentLine->params->ptype == MEMDIR_CON)
 				return LONG;
 			if(currentLine->params->ptype == REGDIR)
 				return WORD;

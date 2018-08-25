@@ -1,0 +1,22 @@
+### SYMBOL TABLE ###
+     INDEX                NAME      TYPE   SECTION     VALUE    LOKAL?
+         1             .RODATA   SECTION         1         0     LOCAL
+         2               CHR_A    SYMBOL         1         0     LOCAL
+         3               CHR_0    SYMBOL         1         2     LOCAL
+         4               .TEXT   SECTION         4         0     LOCAL
+         5           PRINT_HEX    SYMBOL         4         0    GLOBAL
+         6                LOOP    SYMBOL         4        12     LOCAL
+         7              LETTER    SYMBOL         4        38     LOCAL
+         8                 OUT    SYMBOL         4        46     LOCAL
+         9             PRINTLN    SYMBOL         4        68    GLOBAL
+        10          PRINTN_HEX    SYMBOL         4        82    GLOBAL
+
+### .RODATA RELOCATION TABLE ###
+               INDEX            REL_TYPE              OFFSET               VALUE
+
+### .TEXT RELOCATION TABLE ###
+               INDEX            REL_TYPE              OFFSET               VALUE
+                   0           RELTYPE16                  32                   1
+                   1           RELTYPE16                  36                   4
+                   2           RELTYPE16                  40                   1
+

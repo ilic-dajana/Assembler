@@ -39,21 +39,26 @@ void addRecord(RelocationTable* tab, RelType type, long offset, int sym){
 
 int relocation_patch(Symbol* sym, RelType relocation_type, int offset){
 	UINT pat = 0;
-	addRecord(currreltab, relocation_type, offset, sym->num);
 
-	if(relocation_type == REL_16)
-	{
-		if(sym->sctype == GLOBAL)
-			pat = 0;
-		else
-			pat =(UINT) sym->num;
-		return pat;
-	}
+	if(relocation_type == REL_16) {
+        if (sym->sctype == GLOBAL) {
+            pat = 0;
+            addRecord(currreltab, relocation_type, offset, sym->num);
+        } else {
+            pat = (UINT) sym->num;
+            addRecord(currreltab, relocation_type, offset, sym->secNo);
+        }
+        return pat;
+    }
 	else if(relocation_type == RELPC_16){
-		if(sym->sctype == GLOBAL)
-			pat =(UINT)(-2);
-		else
-			pat = (UINT)(sym->num -2);
+		if(sym->sctype == GLOBAL) {
+            pat = (UINT) (-2);
+            addRecord(currreltab, relocation_type, offset, sym->num);
+        }
+		else {
+            pat = (UINT) (sym->num - 2);
+            addRecord(currreltab, relocation_type, offset, sym->secNo);
+        }
 		return pat;
 	}else{
 		error("Unrecognized rel type");
@@ -70,7 +75,7 @@ void writeRelTabToFIle(FILE* file,int tabN, RelocationTable* retab, SymbolTable*
 		RelocationRecNode* rel = NULL;
 
 		fprintf(file, "### %s RELOCATION TABLE ###\n", sym->name);
-		fprintf(file, "%20s%20s%20s%20s", "INDEX", "REL_TYPE", "OFFSET", "VALUE");
+		fprintf(file, "%20s%20s%20s%20s\n", "INDEX", "REL_TYPE", "OFFSET", "VALUE");
 
 		for(rel = retab[i].head; rel; rel = rel->next){
 			RelocationRec record = rel->record;
@@ -82,7 +87,7 @@ void writeRelTabToFIle(FILE* file,int tabN, RelocationTable* retab, SymbolTable*
 				break;
 			}
 
-			fprintf(file, "%ld %s %ld %d", record.rel_num, type, record.offset, record.sym_num);
+			fprintf(file, "%20ld%20s%20ld%20d\n", record.rel_num, type, record.offset, record.sym_num);
 		}
 		fputc('\n', file);
 	}
@@ -206,7 +211,8 @@ int sizeOfinstruction(){
 	else if(is_substr(currentLine->ins->ins_name, "JMP")) {
 		if(currentLine->params->ptype == REGIND_CON || currentLine->params->ptype == REGIND_SYM)
 			return WORD + LONG;
-		if(currentLine->params->ptype == PCREL || currentLine->params->ptype == REGIND_SYM)
+		if(currentLine->params->ptype == PCREL || currentLine->params->ptype == MEMDIR_SYM
+		    || currentLine->params->ptype == MEMDIR_CON)
 			return LONG;
 		if(currentLine->params->ptype == REGDIR)
 			return WORD;

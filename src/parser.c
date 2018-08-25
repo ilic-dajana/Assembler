@@ -74,11 +74,13 @@ Parameter* getParameter(){
 		parameter->ptype = PCREL;
 		token = getNext();
 		if(checkTokenType(T_SYMBOL)){
+			parameter->is_long = 1;
 			strcpy(parameter->symbol, token.name);
 			token = getNext();
 		}
 	}
 	else if(token.token_type == T_ASTERISK){
+		parameter->is_long = 1;
 		parameter->ptype = MEMDIR_CON;
 		token = getNext();
 
@@ -94,8 +96,11 @@ Parameter* getParameter(){
 		parameter->ptype = IMMED_SYM;
 		strcpy(parameter->symbol, token.name);
 		token = getNext();
+		if(token.token_type != T_SYMBOL)
+			error("Undefined instruction");
 	}
 	else if(token.token_type == T_SYMBOL){
+		parameter->is_long = 1;
 		parameter->ptype = MEMDIR_SYM;
 		strcpy(parameter->symbol, token.name);
 		token = getNext();
@@ -113,6 +118,7 @@ Parameter* getParameter(){
 	else if(token.token_type == T_LITERAL){
 		parameter->ptype = IMMED_CON;
 		parameter->value = checkIfCons(mark);
+		parameter->is_long = 1;
 		token = getNext();
 	}
 	else if(token.token_type ==T_REGISTER ) {
