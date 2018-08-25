@@ -23,9 +23,14 @@ void programCode(Line* parsedOutput, char* filename){
         error("File not exist(L22, code.c)");
 
     writeSymTabToFile(tab, outputFile);
+    fputc('\n', outputFile);
+
     writeRelTabToFIle(outputFile, secN, &reltabls[0], tab);
+    fputc('\n', outputFile);
+
+    writeCode(outputFile);
 
     fclose(outputFile);
-    //deleteRelocationTable(reltab, 10);
+    deleteRelocationTable(&reltabls[0], secN);
     deleteSymbolTable(tab);
 }

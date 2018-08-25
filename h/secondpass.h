@@ -33,7 +33,6 @@ typedef struct{
 
 RelocationTable *currreltab;
 RelocationTable reltabls[MAX_SEC];
-
 int secN;
 
 void writeRelTabToFIle(FILE* file, int tabN, RelocationTable* reltab, SymbolTable* tab);
@@ -43,4 +42,13 @@ void addRecord(RelocationTable* tab, RelType type, long offset, int sym);
 void deleteRelocationTable(RelocationTable* tab, int ntabs);
 
 void secondPass(Line* parsedFile);
+
+typedef struct code {
+    char* ins;
+    struct code* next;
+}Code;
+
+Code* program;
+
+void writeCode(FILE* file);
 #endif

@@ -94,10 +94,11 @@ Parameter* getParameter(){
 	}
 	else if(token.token_type == T_AMPERSAND){
 		parameter->ptype = IMMED_SYM;
+        token = getNext();
 		strcpy(parameter->symbol, token.name);
-		token = getNext();
 		if(token.token_type != T_SYMBOL)
 			error("Undefined instruction");
+		token = getNext();
 	}
 	else if(token.token_type == T_SYMBOL){
 		parameter->is_long = 1;
@@ -140,7 +141,7 @@ Parameter* getParameter(){
                 token = getNext();
             }
             else if (token.token_type == T_LITERAL){
-                parameter->ptype = IMMED_CON;
+                parameter->ptype = REGIND_CON;
                 parameter->value = checkIfCons(mark);
                 token = getNext();
             }
@@ -150,15 +151,15 @@ Parameter* getParameter(){
                 token = getNext();
             }
             else
-                error("Unexpected token type(L147, parser.c)");
+                error("Unexpected token type(L154, parser.c)");
             if (!checkTokenType(T_RBRACKET))
-                error("Unexpected token type(L149, parser.c)");
+                error("Unexpected token type(L156, parser.c)");
             else
                 token = getNext();
 	    }
 	}
 	else
-		error("Parameter expected(L155, parser.c)");
+		error("Parameter expected(L162, parser.c)");
 
 return parameter;
 }
@@ -214,10 +215,10 @@ void getcurrent(){
 
 	if(checkTokenType(T_NEWLINE))
 		token = getNext();
-	else if( current->type == O_LABEL)
+	else if(current->type == O_LABEL)
 		return;
 	else
-		error("Unexpected token(L212, parser.c)");
+		error("Unexpected token(L221, parser.c)");
 }
 
 Line* parsing(TokenNode* tokenFile){
@@ -232,7 +233,7 @@ Line* parsing(TokenNode* tokenFile){
 		if(token.token_type != EOF){
 			current = (Line*) calloc(1, sizeof(Line));
 			if(current == NULL)
-				error("NULL pointer exception(L227, parser.c)");
+				error("NULL pointer exception(L236, parser.c)");
 
 			getcurrent(token);
 

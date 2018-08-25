@@ -31,6 +31,10 @@ int main(int argc, char* argv[]){
         else if(head->tok.token_type == T_INSTRUCTION)
         { printf("[TT_INSTRUCTION]  # %s\n", head->tok.name);
         }
+        else if(head->tok.token_type == T_AMPERSAND)
+        {
+            printf("[TT_AMPERSAND} #%s\n", "&");
+        }
         else if(head->tok.token_type == T_REGISTER)
         {  printf("[TT_REGISTER]     # %s\n", head->tok.name);
         }

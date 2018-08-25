@@ -1,24 +1,28 @@
-; main.s - Greatest Common Divisor.
-
-.data
-M:              .word 36
-N:              .word 27
+; gcd.s - Greatest Common Divisor (GCD)
 
 .text
 
-.global gcd
 .global print_hex
-.global println
 
-.global START
-START:
-                push N
-                push M
-                call gcd
-                add r6, 4
-                push r0
-                call print_hex
-                add r6, 2
-                call println
+.global gcd
+gcd:
+            push r1
+            push r2
+
+            mov r1, r6[6]
+            mov r2, r6[8]
+
+loop:       cmp r2, r1
+            jmpeq stop
+            jmpgt less
+            sub r1, r2
+            jmp loop
+less:       sub r2, r1
+            jmp loop
+stop:       mov r0, r1
+
+            pop r2
+            pop r1
+            ret
 
 .end

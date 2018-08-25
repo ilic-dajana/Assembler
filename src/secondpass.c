@@ -16,6 +16,7 @@ Symbol* currentDirective;
 Line* currentLine;
 int end = 0;
 
+//Realocation table
 void addRecord(RelocationTable* tab, RelType type, long offset, int sym){
 
 	RelocationRecNode* node = (RelocationRecNode*) malloc(sizeof(RelocationRecNode));
@@ -29,28 +30,28 @@ void addRecord(RelocationTable* tab, RelType type, long offset, int sym){
 	else
 		tab->tail = tab->tail->next = node;
 
-
 	node->record.rel_num = tab->cnt++;
 	node->record.type = type;
 	node->record.offset = offset;
 	node->record.sym_num = sym;
-
 }
 
-int relocation_patch(Symbol* sym, RelType relocation_type, int offset){
+int record_process(Symbol* sym, RelType relocation_type, int offset){
 	UINT pat = 0;
 
 	if(relocation_type == REL_16) {
         if (sym->sctype == GLOBAL) {
             pat = 0;
             addRecord(currreltab, relocation_type, offset, sym->num);
-        } else {
+        }
+        else {
             pat = (UINT) sym->num;
             addRecord(currreltab, relocation_type, offset, sym->secNo);
         }
-        return pat;
+
+	return pat;
     }
-	else if(relocation_type == RELPC_16){
+	else if(relocation_type == RELPC_16) {
 		if(sym->sctype == GLOBAL) {
             pat = (UINT) (-2);
             addRecord(currreltab, relocation_type, offset, sym->num);
@@ -61,16 +62,17 @@ int relocation_patch(Symbol* sym, RelType relocation_type, int offset){
         }
 		return pat;
 	}else{
-		error("Unrecognized rel type");
+		error("Unrecognized realocation type(L65, secondpass)");
 	}
 }
-void writeRelTabToFIle(FILE* file,int tabN, RelocationTable* retab, SymbolTable* tab) {
-	for (int i =0; i < tabN; i++){
 
+void writeRelTabToFIle(FILE* file,int tabN, RelocationTable* retab, SymbolTable* tab) {
+
+	for (int i =0; i < tabN; i++){
 		char* name = "<UNKNOWN SECTION>";
 		Symbol* sym = findSection(tab, retab[i].sec);
 		if(sym == NULL)
-			error("Symbol not found L68 secondpass");
+			error("Symbol not found(L75, secondpass)");
 
 		RelocationRecNode* rel = NULL;
 
@@ -89,6 +91,7 @@ void writeRelTabToFIle(FILE* file,int tabN, RelocationTable* retab, SymbolTable*
 
 			fprintf(file, "%20ld%20s%20ld%20d\n", record.rel_num, type, record.offset, record.sym_num);
 		}
+
 		fputc('\n', file);
 	}
 }
@@ -98,19 +101,54 @@ void writeRelTabToFIle(FILE* file,int tabN, RelocationTable* retab, SymbolTable*
 void deleteRelocationTable(RelocationTable* tab, int ntabs){
 	RelocationRecNode* temp = tab->head;
 
-	while(temp && ntabs){
+	while(ntabs){
 		--ntabs;
-		tab->head = tab->head->next;
-		free(temp);
-		temp = tab->head;
-	}
-	if(tab->head == NULL)
-	{
-		tab->tail = NULL;
-		tab->cnt = 0;
+		while(temp) {
+			tab->head = tab->head->next;
+			free(temp);
+			temp = tab->head;
+		}
 	}
 }
 
+//second pass assembler
+int encodeInstruction(UINT begin, UINT end, int islong){
+	unsigned char* buffer;
+	char* instruction_in_bytes = (char*)&begin;
+    Code* temp = (Code*) malloc(sizeof(Code));
+    if(temp == NULL)
+    	error("Null pointer exception (L120, secondpass)");
+
+    *buffer++ = *(instruction_in_bytes + 1);
+    *buffer++ = *instruction_in_bytes;
+
+    if(islong == 1) {
+        instruction_in_bytes = (char*) &end;
+        *buffer++ = *instruction_in_bytes;
+        *buffer++ = *(instruction_in_bytes + 1);
+    }
+    temp->ins = buffer;
+
+    if(program == NULL)
+		program = temp;
+	else {
+		Code* first = program;
+		while(first->next != NULL){
+			first = first->next;
+		}
+		first->next = temp;
+	}
+}
+
+void writeCode(FILE* file){
+	Code* temp = program;
+	fprintf(file, "###PROGRAM CODE###\n");
+
+	while(temp) {
+		fprintf(file, "%s\n", temp->ins);
+		temp = temp->next;
+	}
+}
 
 UINT getEndParam(Parameter* param, UINT* begin, int offset){
 	UINT end = 0;
@@ -122,9 +160,11 @@ UINT getEndParam(Parameter* param, UINT* begin, int offset){
 	else if(param->ptype == IMMED_SYM) {
 		*begin |= IMMED << offset;
 		Symbol* sym = findSymbol(tab, param->symbol);
+
 		if(sym == NULL)
-			error("Symbol not found! L140 secondpass");
-		end =(UINT)relocation_patch(sym, REL_16, cnt + WORD);
+			error("Symbol not found!(L165,secondpass)");
+
+		end =(UINT)record_process(sym, REL_16, cnt + WORD);
 	}
 	else if(param->ptype == MEMDIR_CON) {
 		*begin |= MEMDIR <<offset;
@@ -134,16 +174,18 @@ UINT getEndParam(Parameter* param, UINT* begin, int offset){
 		*begin |= MEMDIR << offset;
 		Symbol* sym = findSymbol(tab, param->symbol);
 		if(sym == NULL)
-			error("Symbol not found!");
-		end = (UINT) relocation_patch(sym, REL_16, cnt + WORD);
+			error("Symbol not found!(L176, secondpass)");
+		end = (UINT) record_process(sym, REL_16, cnt + WORD);
 	}
 	else if(param->ptype == PCREL) {
 		*begin |= REGINDPOM << offset;
 		Symbol* sym = findSymbol(tab, param->symbol);
-		if(sym == NULL)
-			error("Symbol not found");
 
-		end = (UINT) ((sym->secNo == currentDirective->secNo) ? (sym->val - cnt - LONG) : (relocation_patch(sym, RELPC_16, cnt + WORD)));
+		if(sym == NULL)
+			error("Symbol not found!(L185, secondpass)");
+
+		end = (UINT) ((sym->secNo == currentDirective->secNo) ? (sym->val - cnt - LONG) :
+											(record_process(sym, RELPC_16, cnt + WORD)));
 	}
 	else if(param->ptype == REGIND_CON) {
 		*begin |= REGINDPOM << offset;
@@ -152,30 +194,28 @@ UINT getEndParam(Parameter* param, UINT* begin, int offset){
 	else if(param->ptype == REGIND_SYM) {
 		*begin |= REGINDPOM << offset;
 		Symbol* sym = findSymbol(tab, param->symbol);
-		if(sym == NULL)
-			error("Symbol not found L170 secondpass");
 
-		end = (UINT) relocation_patch(sym, REL_16, cnt + WORD);
+		if(sym == NULL)
+			error("Symbol not found!(L170,secondpass)");
+
+		end = (UINT) record_process(sym, REL_16, cnt + WORD);
 	}
 	else if(param->ptype == REGDIR) {
 		*begin |= A_REGDIR<<offset;
 	}
 	else
-		error("Invalid parameter type");
+		error("Invalid parameter type!(L207, secondpass)");
 
 	return end;
 }
+
 void pseudoIns(UINT* begin, UINT* end) {
 
-	if(is_substr(currentLine->ins->ins_name, "HALT")) {
-		*begin |= ((currentLine->ins->cond << 14) | 0x18e0);
-		*end = 0x0010;
-	}
-
-	if(is_substr(currentLine->ins->ins_name, "RET"))
+	if(is_substr(currentLine->ins->ins_name, "RET")) {
 		*begin |= ((currentLine->ins->cond << 14) | (0xA << 10)
 				| (A_REGDIR << 8) | (0x7 << 5) | (A_REGDIR << 3));
-
+		encodeInstruction(*begin, *end, 0);
+	}
 
 	if(is_substr(currentLine->ins->ins_name, "JMP")) {
 		*begin |= currentLine->ins->cond << 14;
@@ -183,27 +223,35 @@ void pseudoIns(UINT* begin, UINT* end) {
 		*begin |= ((REGDIR << 8) | (0x7 << 5));
         Parameter param = *currentLine->params;
         param.next = NULL;
-		if(param.ptype == A_REGDIR)
+
+		if(param.ptype == A_REGDIR) {
 			*begin |= ((A_REGDIR << 3) | (param.regNo));
+			encodeInstruction(*begin, *end, 0);
+		}
 		else if(param.ptype == MEMDIR_CON) {
 			param.ptype = IMMED_CON;
 			*end = getEndParam(&param, begin, 3);
+			encodeInstruction(*begin, *end, 1);
 		}
 		else if(param.ptype == MEMDIR_SYM) {
 			param.ptype = IMMED_SYM;
 			*end = getEndParam(&param, begin, 3);
+			encodeInstruction(*begin, *end, 1);
 		}
 		else if(param.ptype== PCREL) {
 			Symbol* sym = findSymbol(tab, param.symbol);
 			if(sym == NULL)
 				error("Symbol not found");
 			*begin |= IMMED << 3;
-			*end = (UINT) ((sym->secNo == currentDirective->secNo) ? (sym->val - cnt - LONG) : (relocation_patch(sym, RELPC_16, cnt + WORD)));
+			*end = (UINT) ((sym->secNo == currentDirective->secNo) ? (sym->val - cnt - LONG) :
+													(record_process(sym, RELPC_16, cnt + WORD)));
+			encodeInstruction(*begin, *end, 1);
 		}
 		else
-			error("Undefined symbol! L215 secondpass");
+			error("Undefined parameter type!(L251, secondpass)");
 	}
 }
+
 int sizeOfinstruction(){
 
 	if(is_substr(currentLine->ins->ins_name, "RET")) {
@@ -233,17 +281,17 @@ void secondPass(Line* parsedFile){
 	currentDirective = NULL;
 	currentLine = parsedFile;
 	currreltab = NULL;
-
+	program = NULL;
 	while(currentLine){
 		if(currentLine->type == O_INSTRUCTION){
 			UINT begin = 0;
 			UINT end = 0;
 
-			if(currentLine->ins->ins != NON){
+			if(currentLine->ins->ins != NON) {
 				begin |= currentLine->ins->cond << 14;
 				end |= currentLine->ins->ins << 10;
 
-				if(currentLine->params != NULL){
+				if(currentLine->params != NULL) {
 
 					if(currentLine->params->ptype == PCREL)
 						begin |= (0x7<<5);
@@ -270,11 +318,15 @@ void secondPass(Line* parsedFile){
 					begin |= A_REGDIR << 8;
 					begin |= A_REGDIR << 3;
 				}
+				int islong = 0;
+				if(sizeOfinstruction() == LONG)
+					islong = 1;
+				encodeInstruction(begin, end, islong);
 			}
 			else {
 					pseudoIns(&begin, &end);
 			}
-        cnt += sizeOfinstruction();
+       		 cnt += sizeOfinstruction();
 		}
 		else if(currentLine->type == O_DIRECTIVE){
 
@@ -295,7 +347,6 @@ void secondPass(Line* parsedFile){
 				int n = currentLine->paramNo;
 				int size = 0;
 				Parameter* param = currentLine->params;
-				int value;
 
 				if(strcmp(currentLine->dir->dir, ".CHAR") == 0)
 					size = 1;
@@ -323,7 +374,7 @@ void secondPass(Line* parsedFile){
 					cnt = 0;
 					currentDirective = findSymbol(tab, currentLine->dir->dir);
 					if(currentDirective == NULL)
-						error("Directive not in symbol table! L188, secondpass");
+						error("Directive not in symbol table!(L376, secondpass)");
 
 					if(currreltab != NULL) {
 						++currreltab;
@@ -338,5 +389,4 @@ void secondPass(Line* parsedFile){
 		}
 		currentLine = currentLine->next;
 	}
-
 }
