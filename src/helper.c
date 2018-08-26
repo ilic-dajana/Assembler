@@ -19,7 +19,7 @@ void parseArg(int argc, char* argv[]){
 	//program call: asm -o outfilename infilename
 	while((c = getopt(argc, argv, "o:")) != -1){
 	    switch(c){
-	        case 'o': infile = optarg;
+	        case 'o': outfile = optarg;
 	        break;
             case '?':
                 if (optopt == 'i' || optopt == 'o')

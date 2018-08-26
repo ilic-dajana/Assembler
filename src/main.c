@@ -11,9 +11,9 @@ char* outfile;
 
 int main(int argc, char* argv[]){
 
-    const char* filename = "test.txt";
-
-    Buffer file = loadFromFile(filename);
+  //  parseArg(argc, argv);
+    
+    Buffer file = loadFromFile("test.txt");
 
     TokenNode* tf = tokenizingFile(file);
 
@@ -154,6 +154,6 @@ int main(int argc, char* argv[]){
         curr = curr->next;
     }
 
-    programCode(parsedFile , "output.txt");
+    programCode(parsedFile, "output.txt");
 
 }

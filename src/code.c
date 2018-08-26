@@ -11,9 +11,10 @@
 
 
 void programCode(Line* parsedOutput, char* filename){
+  
     if(!parsedOutput || !filename)
         error("NULL pointer exception (L15, code.c)");
-    firstPass(parsedOutput);
+   firstPass(parsedOutput);
     secondPass(parsedOutput);
 
     FILE* outputFile = NULL;

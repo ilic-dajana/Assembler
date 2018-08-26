@@ -8,11 +8,11 @@ main:
 	mov r1, r6[6]
 	mov r5[5], r4
 
-one:	add r2, 1
+one:	add r2, 1	
 	cmp r2, r1
 	jmpeq one
 	jmpgt two
-
+	
 	sub r1, r2
 	add r2, 4
 	jmp one

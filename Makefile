@@ -1,6 +1,3 @@
-# Makefile
-# id150325d		
-
 CC = gcc
 SRCDIR = src
 HDIR = h

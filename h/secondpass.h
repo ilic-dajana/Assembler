@@ -44,7 +44,8 @@ void deleteRelocationTable(RelocationTable* tab, int ntabs);
 void secondPass(Line* parsedFile);
 
 typedef struct code {
-    char* ins;
+    unsigned char ins[4];
+    int islong;
     struct code* next;
 }Code;
 

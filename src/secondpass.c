@@ -10,7 +10,6 @@
 #define LONG 4
 
 typedef  unsigned  int UINT;
-static char* to_ptr;
 static int cnt;
 Symbol* currentDirective;
 Line* currentLine;
@@ -45,7 +44,7 @@ int record_process(Symbol* sym, RelType relocation_type, int offset){
             addRecord(currreltab, relocation_type, offset, sym->num);
         }
         else {
-            pat = (UINT) sym->num;
+            pat = (UINT) sym->val;
             addRecord(currreltab, relocation_type, offset, sym->secNo);
         }
 
@@ -57,7 +56,7 @@ int record_process(Symbol* sym, RelType relocation_type, int offset){
             addRecord(currreltab, relocation_type, offset, sym->num);
         }
 		else {
-            pat = (UINT) (sym->num - 2);
+            pat = (UINT) (sym->val - 2);
             addRecord(currreltab, relocation_type, offset, sym->secNo);
         }
 		return pat;
@@ -113,7 +112,8 @@ void deleteRelocationTable(RelocationTable* tab, int ntabs){
 
 //second pass assembler
 int encodeInstruction(UINT begin, UINT end, int islong){
-	unsigned char* buffer;
+	unsigned char buff[4] = {'\0'};
+	char* buffer = &buff[0];
 	char* instruction_in_bytes = (char*)&begin;
     Code* temp = (Code*) malloc(sizeof(Code));
     if(temp == NULL)
@@ -127,7 +127,8 @@ int encodeInstruction(UINT begin, UINT end, int islong){
         *buffer++ = *instruction_in_bytes;
         *buffer++ = *(instruction_in_bytes + 1);
     }
-    temp->ins = buffer;
+	temp->islong = islong;
+    strcpy(temp->ins, buff);
 
     if(program == NULL)
 		program = temp;
@@ -145,7 +146,14 @@ void writeCode(FILE* file){
 	fprintf(file, "###PROGRAM CODE###\n");
 
 	while(temp) {
-		fprintf(file, "%s\n", temp->ins);
+
+			fprintf(file, "%02x ", (unsigned char) temp->ins[0]);
+			fprintf(file, "%02x ", (unsigned char) temp->ins[1]);
+		if(temp->islong) {
+			fprintf(file, "%02x ", (unsigned char) temp->ins[2]);
+			fprintf(file, "%02x " , (unsigned char) temp->ins[3]);
+		}
+		fputc('\n', file);
 		temp = temp->next;
 	}
 }
@@ -212,19 +220,23 @@ UINT getEndParam(Parameter* param, UINT* begin, int offset){
 void pseudoIns(UINT* begin, UINT* end) {
 
 	if(is_substr(currentLine->ins->ins_name, "RET")) {
-		*begin |= ((currentLine->ins->cond << 14) | (0xA << 10)
-				| (A_REGDIR << 8) | (0x7 << 5) | (A_REGDIR << 3));
+		*begin |= (currentLine->ins->cond << 14);
+		*begin |= (0xA << 10);
+		*begin |= (A_REGDIR << 8);
+		*begin |= (0x7 << 5);
+		*begin |= (A_REGDIR << 3);
 		encodeInstruction(*begin, *end, 0);
 	}
 
 	if(is_substr(currentLine->ins->ins_name, "JMP")) {
 		*begin |= currentLine->ins->cond << 14;
 		*begin |= (((currentLine->params->ptype == PCREL) ? 0x0 : 0xd) << 10);
-		*begin |= ((REGDIR << 8) | (0x7 << 5));
+		*begin |= (A_REGDIR << 8);
+		*begin |= (0x7 << 5);
         Parameter param = *currentLine->params;
         param.next = NULL;
 
-		if(param.ptype == A_REGDIR) {
+		if(param.ptype == REGDIR) {
 			*begin |= ((A_REGDIR << 3) | (param.regNo));
 			encodeInstruction(*begin, *end, 0);
 		}
@@ -243,9 +255,12 @@ void pseudoIns(UINT* begin, UINT* end) {
 			if(sym == NULL)
 				error("Symbol not found");
 			*begin |= IMMED << 3;
-			*end = (UINT) ((sym->secNo == currentDirective->secNo) ? (sym->val - cnt - LONG) :
-													(record_process(sym, RELPC_16, cnt + WORD)));
-			encodeInstruction(*begin, *end, 1);
+			if(sym->secNo == currentDirective->secNo)
+				*end = (UINT)(sym->val - cnt - LONG);
+			else
+				*end = record_process(sym, RELPC_16, cnt + WORD);
+
+			 encodeInstruction(*begin, *end, 1);
 		}
 		else
 			error("Undefined parameter type!(L251, secondpass)");
@@ -289,14 +304,15 @@ void secondPass(Line* parsedFile){
 
 			if(currentLine->ins->ins != NON) {
 				begin |= currentLine->ins->cond << 14;
-				end |= currentLine->ins->ins << 10;
+				begin |= currentLine->ins->ins << 10;
 
 				if(currentLine->params != NULL) {
 
 					if(currentLine->params->ptype == PCREL)
-						begin |= (0x7<<5);
+						begin |= ((0x7)<<5);
 					else
-						begin |= (currentLine->params->regNo<<5);
+						begin |= ((currentLine->params->regNo)<<5);
+
 					end = getEndParam(currentLine->params, &begin, 8);
 
 					if(currentLine->params->next != NULL) {

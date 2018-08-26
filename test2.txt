@@ -1,0 +1,27 @@
+.data
+
+one: .word 5
+
+two: .word 3
+
+three: .long 6
+
+.text
+
+.global print
+.global main
+main:
+	push &one
+	mov r1, two
+	push two
+	call print
+again:	
+	add r1, 4
+	cmp r1, r5
+	jmpgt end
+	
+	add r1, two
+	jmp again
+	
+end:
+.end

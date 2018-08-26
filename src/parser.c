@@ -94,6 +94,7 @@ Parameter* getParameter(){
 	}
 	else if(token.token_type == T_AMPERSAND){
 		parameter->ptype = IMMED_SYM;
+		parameter->is_long = 1;
         token = getNext();
 		strcpy(parameter->symbol, token.name);
 		if(token.token_type != T_SYMBOL)

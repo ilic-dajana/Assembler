@@ -6,41 +6,43 @@
 
 #IncludeRegexTransform: 
 
-../h/data_types.h
-
-../h/error.h
-
-../h/firstpass.h
+../h/code.h
 data_types.h
 ../h/data_types.h
-stdio.h
--
+
+../h/data_types.h
 
 ../h/helper.h
 data_types.h
 ../h/data_types.h
 
-../h/secondpass.h
+../h/lexer.h
 data_types.h
 ../h/data_types.h
-stdio.h
--
-firstpass.h
-../h/firstpass.h
+tables.h
+../h/tables.h
 
-/home/dajana/Desktop/SS_project/src/secondpass.c
-secondpass.h
-/home/dajana/Desktop/SS_project/src/secondpass.h
-firstpass.h
-/home/dajana/Desktop/SS_project/src/firstpass.h
+../h/parser.h
 data_types.h
-/home/dajana/Desktop/SS_project/src/data_types.h
-helper.h
-/home/dajana/Desktop/SS_project/src/helper.h
-error.h
-/home/dajana/Desktop/SS_project/src/error.h
-string.h
+../h/data_types.h
+
+../h/tables.h
+data_types.h
+../h/data_types.h
+
+/home/dajana/Desktop/SS_project/src/main.c
+stdio.h
 -
 stdlib.h
 -
+helper.h
+/home/dajana/Desktop/SS_project/src/helper.h
+lexer.h
+/home/dajana/Desktop/SS_project/src/lexer.h
+data_types.h
+/home/dajana/Desktop/SS_project/src/data_types.h
+parser.h
+/home/dajana/Desktop/SS_project/src/parser.h
+code.h
+/home/dajana/Desktop/SS_project/src/code.h
 
