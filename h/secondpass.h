@@ -46,6 +46,7 @@ void secondPass(Line* parsedFile);
 typedef struct code {
     unsigned char ins[4];
     int islong;
+    char section[15];
     struct code* next;
 }Code;
 

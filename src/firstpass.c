@@ -19,7 +19,7 @@ extern SymbolTable* tab;
 Symbol* addSymbol(SymbolTable* tab,const char* name, long secNo, ScopeType sctype, long val){
 
 	SymbolNode* node = (SymbolNode*) malloc(sizeof(SymbolNode));
-
+	
 	if(!node)
 		error("Memory allocation problem");
 

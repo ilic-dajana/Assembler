@@ -67,6 +67,7 @@ int isTypeSym(TokenType tt){
 
 Parameter* getParameter(){
 	Parameter* parameter = (Parameter*) malloc(sizeof(Parameter));
+	parameter->next = NULL;
 	int mark = 1;
 	parameter->regNo = 0;
 
@@ -235,6 +236,7 @@ Line* parsing(TokenNode* tokenFile){
 			current = (Line*) calloc(1, sizeof(Line));
 			if(current == NULL)
 				error("NULL pointer exception(L236, parser.c)");
+			current->next = NULL;
 
 			getcurrent(token);
 

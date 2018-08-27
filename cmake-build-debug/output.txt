@@ -1,30 +1,42 @@
 ### SYMBOL TABLE ###
      INDEX                NAME      TYPE   SECTION     VALUE    LOKAL?
-         1               .TEXT   SECTION         1         0     LOCAL
-         2                MAIN    SYMBOL         1         0    GLOBAL
-         3                 ONE    SYMBOL         1        12     LOCAL
-         4                 TWO    SYMBOL         1        36     LOCAL
+         1               .DATA   SECTION         1         0     LOCAL
+         2                 ONE    SYMBOL         1         0     LOCAL
+         3                 TWO    SYMBOL         1         2     LOCAL
+         4               THREE    SYMBOL         1         4     LOCAL
+         5               .TEXT   SECTION         5         0     LOCAL
+         6               PRINT    SYMBOL         0         0    GLOBAL
+         7                MAIN    SYMBOL         5         0    GLOBAL
+         8               AGAIN    SYMBOL         5        16     LOCAL
+         9                 END    SYMBOL         5        34     LOCAL
 
+
+### .DATA RELOCATION TABLE ###
+               INDEX            REL_TYPE              OFFSET               VALUE
 
 ### .TEXT RELOCATION TABLE ###
                INDEX            REL_TYPE              OFFSET               VALUE
-                   0           RELTYPE16                  20                   1
-                   1           RELTYPE16                  24                   1
-                   2           RELTYPE16                  34                   1
+                   0           RELTYPE16                   2                   1
+                   1           RELTYPE16                   6                   1
+                   2           RELTYPE16                  10                   1
+                   3           RELTYPE16                  14                   6
+                   4           RELTYPE16                  24                   5
+                   5           RELTYPE16                  28                   1
+                   6           RELTYPE16                  32                   5
 
 
 ###PROGRAM CODE###
-e5 a8 
-e9 88 
-f5 3e 06 00 
-f7 ac 05 00 
-c1 40 01 00 
-d1 49 
-35 e0 0c 00 
-b5 e0 24 00 
-c5 2a 
-c1 40 04 00 
-f5 e0 0c 00 
-f5 09 
-e9 a8 
-e5 88 
+###SECTION .DATA ###
+05 00 
+03 00 
+03 00 
+###SECTION .TEXT ###
+e4 08 00 00 
+f5 30 02 00 
+e6 08 02 00 
+ee 08 00 00 
+c1 20 04 00 
+d1 2d 
+b5 e0 22 00 
+c1 30 02 00 
+f5 e0 10 00 

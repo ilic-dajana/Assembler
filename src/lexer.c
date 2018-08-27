@@ -105,7 +105,8 @@ TokenNode* make_token_list(){
 		if(!node){
 			 error("NULL pointer exception(L106, lexer.c)");
 			}
-
+		node->next = NULL;
+			
 		if(!head)
 			head = tail =node;
 		else

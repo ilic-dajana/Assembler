@@ -23,7 +23,8 @@ void addRecord(RelocationTable* tab, RelType type, long offset, int sym){
 	if(!node){
 		error("Memory alloc problem");
 	}
-
+	node->next = NULL;
+	
 	if(tab->head == NULL)
 		tab->tail = tab->head = node;
 	else
@@ -118,6 +119,7 @@ int encodeInstruction(UINT begin, UINT end, int islong){
     Code* temp = (Code*) malloc(sizeof(Code));
     if(temp == NULL)
     	error("Null pointer exception (L120, secondpass)");
+    temp->next = NULL;
 
     *buffer++ = *(instruction_in_bytes + 1);
     *buffer++ = *instruction_in_bytes;
@@ -129,6 +131,7 @@ int encodeInstruction(UINT begin, UINT end, int islong){
     }
 	temp->islong = islong;
     strcpy(temp->ins, buff);
+    strcpy(temp->section, currentDirective->name);
 
     if(program == NULL)
 		program = temp;
@@ -144,8 +147,15 @@ int encodeInstruction(UINT begin, UINT end, int islong){
 void writeCode(FILE* file){
 	Code* temp = program;
 	fprintf(file, "###PROGRAM CODE###\n");
+    char curr[10] ;
+    strcpy(curr, temp->section);
 
+    fprintf(file, "###SECTION %s ###\n", curr);
 	while(temp) {
+            if(strcmp(curr,temp->section) != 0){
+                strcpy(curr, temp->section);
+                fprintf(file, "###SECTION %s ###\n", curr);
+            }
 
 			fprintf(file, "%02x ", (unsigned char) temp->ins[0]);
 			fprintf(file, "%02x ", (unsigned char) temp->ins[1]);
@@ -363,7 +373,9 @@ void secondPass(Line* parsedFile){
 				int n = currentLine->paramNo;
 				int size = 0;
 				Parameter* param = currentLine->params;
-
+                long val;
+                char buff[4];
+                char* buffer = &buff[0];
 				if(strcmp(currentLine->dir->dir, ".CHAR") == 0)
 					size = 1;
 				else if(strcmp(currentLine->dir->dir, ".WORD") == 0)
@@ -371,14 +383,47 @@ void secondPass(Line* parsedFile){
 				else if(strcmp(currentLine->dir->dir, "DWORD") == 0 || strcmp(currentLine->dir->dir, ".LONG"))
 					size = 4;
 
-				if(n == 0)
-					cnt += size;
+				if(n == 0) {
+                    cnt += size;
+                    val = 0;
+                    char *byte = (char*) &val;
+                    for (int i = 0; i<size; ++i)
+                        *buffer++ = *(byte + i);
+				}
 				else {
 					while(param){
 						cnt += size;
+						if(param->ptype == IMMED_CON)
+						    val = param->value;
+						else {
+						    Symbol* sym = findSymbol(tab, param->symbol);
+						    if(sym == NULL)
+						        error("Symbol not found(second pass, L399");
+						    val = record_process(sym, REL_16, cnt);
+						}
+						char* byte = (char*) &val;
+						for(int i = 0; i < size; ++i)
+						    *buffer++ = *(byte + i);
+
 						param = param->next;
 					}
 				}
+				Code* temp = (Code*) malloc(sizeof(Code));
+				temp->next = NULL;
+
+                temp->islong = 0;
+                strcpy(temp->ins, buff);
+                strcpy(temp->section, currentDirective->name);
+
+                if(program == NULL)
+                    program = temp;
+                else {
+                    Code* first = program;
+                    while(first->next != NULL){
+                        first = first->next;
+                    }
+                    first->next = temp;
+                }
 			}
 			else if (currentLine->dir->dirType == IMPORT_EXPORT){
 
